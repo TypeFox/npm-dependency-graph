@@ -1,13 +1,25 @@
 {
   "private": true,
   "name": "standalone-app",
+  "license": "Apache-2.0",
   "version": "0.0.0",
   "dependencies": {
+    "bootstrap": "^4.1.1",
+    "express": "^4.16.3",
     "npm-dependency-graph-extension": "0.0.0",
     "reflect-metadata": "^0.1.12"
   },
-  "scripts": {},
   "devDependencies": {
-    "webpack": "^4.6.0"
+    "rimraf": "latest",
+    "typescript": "latest",
+    "uglify-loader": "^2.0.0",
+    "webpack": "^3.11.0"
+  },
+  "scripts": {
+    "prepare": "yarn run clean && yarn run build",
+    "clean": "rimraf lib app/bootstrap app/jquery app/sprotty app/bundle.js app/bundle.js.map",
+    "build": "tsc && webpack --env.uglify",
+    "watch": "webpack --watch",
+    "start": "node lib/backend/server"
   }
 }

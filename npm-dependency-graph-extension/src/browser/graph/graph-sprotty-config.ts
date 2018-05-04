@@ -9,16 +9,19 @@
 
 import { ContainerModule, Container } from 'inversify';
 import {
-    TYPES, LocalModelSource, ConsoleLogger, LogLevel, SGraphFactory, configureModelElement, SGraph,
+    TYPES, ConsoleLogger, LogLevel, SGraphFactory, configureModelElement, SGraph,
     SGraphView, RectangularNodeView, PolylineEdgeView, HtmlRoot, HtmlRootView, PreRenderedElement,
     PreRenderedView, SLabel, SLabelView, SCompartment, SCompartmentView, defaultModule, selectModule,
     moveModule, boundsModule, fadeModule, viewportModule, exportModule, hoverModule
 } from 'sprotty/lib';
 import { DependencyGraphNode, DependencyGraphEdge } from './graph-model';
+import { DependencyGraphGenerator } from './graph-generator';
+import { DepGraphModelSource } from './model-source';
 
 export default () => {
     const depGraphModule = new ContainerModule((bind, unbind, isBound, rebind) => {
-        bind(TYPES.ModelSource).to(LocalModelSource).inSingletonScope();
+        bind(DependencyGraphGenerator).toSelf().inSingletonScope();
+        bind(TYPES.ModelSource).to(DepGraphModelSource).inSingletonScope();
         rebind(TYPES.ILogger).to(ConsoleLogger).inSingletonScope();
         rebind(TYPES.LogLevel).toConstantValue(LogLevel.warn);
         rebind(TYPES.IModelFactory).to(SGraphFactory).inSingletonScope();

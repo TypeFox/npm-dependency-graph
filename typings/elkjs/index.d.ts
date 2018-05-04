@@ -1,4 +1,4 @@
-declare module "elkjs" {
+declare module "elkjs/lib/elk-api" {
 
     export interface ElkPoint {
         x: number
@@ -59,8 +59,15 @@ declare module "elkjs" {
         outgoingSections?: string[]
     }
 
-    export class ELK {
+    export interface ELK {
         layout(graph: ElkNode): Promise<void>;
     }
+    const elk: {
+        new(args?: { workerUrl: string }): ELK;
+    };
+    export default elk;
+}
 
+declare module "elkjs" {
+    export * from "elkjs/lib/elk-api";
 }

@@ -7,20 +7,16 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { ELK, ElkNode, ElkGraphElement, ElkEdge, ElkLabel, ElkShape, ElkPrimitiveEdge } from 'elkjs';
+import ELK from 'elkjs/lib/elk-api';
+import { ElkNode, ElkGraphElement, ElkEdge, ElkLabel, ElkShape, ElkPrimitiveEdge } from 'elkjs';
 import { SGraphSchema, SModelIndex, SModelElementSchema, SNodeSchema, SShapeElementSchema, SEdgeSchema, SLabelSchema, Point } from 'sprotty/lib';
 
 export function elkLayout(graph: SGraphSchema, index: SModelIndex<SModelElementSchema>): Promise<void> {
-    return new Promise((resolve, reject) => {
-        const elkGraph = transformToElk(graph) as ElkNode;
-        const elk = new ELK()
-        elk.layout(elkGraph)
-            .then(() => {
-                applyLayout(elkGraph, index);
-                resolve();
-            })
-            .catch(error => reject(error));
-    });
+    const elkGraph = transformToElk(graph) as ElkNode;
+    const elk = new ELK({
+        workerUrl: 'elk/elk-worker.min.js'
+    })
+    return elk.layout(elkGraph).then(() => applyLayout(elkGraph, index));
 }
 
 function transformToElk(smodel: SModelElementSchema): ElkGraphElement {
@@ -29,6 +25,7 @@ function transformToElk(smodel: SModelElementSchema): ElkGraphElement {
             const sgraph = smodel as SGraphSchema;
             return <ElkNode>{
                 id: sgraph.id,
+                properties: { algorithm: 'layered' },
                 children: sgraph.children.filter(c => c.type === 'node').map(c => transformToElk(c)) as ElkNode[],
                 edges: sgraph.children.filter(c => c.type === 'edge').map(c => transformToElk(c)) as ElkEdge[]
             };

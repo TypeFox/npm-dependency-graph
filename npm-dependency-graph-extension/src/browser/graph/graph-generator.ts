@@ -7,14 +7,16 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+import { injectable } from "inversify";
 import { getJSON } from "jquery";
 import { maxSatisfying } from "semver";
-import { SGraphSchema, SModelIndex, SModelElementSchema } from "sprotty/lib";
+import { SGraphSchema, SModelIndex, SModelElementSchema, SLabelSchema } from "sprotty/lib";
 import { PackageNode, PackageDependency } from "./graph-model";
 import { PackageMetadata, VersionMetadata } from "./registry-metadata";
 
 const REGISTRY_URL = 'https://registry.npmjs.org';
 
+@injectable()
 export class DependencyGraphGenerator {
 
     registryUrl = REGISTRY_URL;
@@ -30,12 +32,7 @@ export class DependencyGraphGenerator {
     generateNode(name: string, version?: string): PackageNode {
         let node = this.index.getById(name) as PackageNode;
         if (node === undefined) {
-            node = {
-                type: 'node',
-                id: name,
-                name,
-                versions: []
-            };
+            node = this.createNode(name);
             this.graph.children.push(node);
             this.index.add(node);
         }
@@ -43,6 +40,24 @@ export class DependencyGraphGenerator {
             node.versions.push(version);
         }
         return node;
+    }
+
+    private createNode(name: string): PackageNode {
+        return {
+            type: 'node',
+            id: name,
+            name,
+            versions: [],
+            size: { width: 10, height: 10 },
+            layout: 'vbox',
+            children: [
+                <SLabelSchema>{
+                    type: 'label',
+                    id: `${name}/label`,
+                    text: name
+                }
+            ]
+        };
     }
 
     resolveNode(node: PackageNode): Promise<SGraphSchema> {

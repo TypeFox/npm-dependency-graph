@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="sprotty/sprotty.css">
+	<link rel="stylesheet" href="page.css">
+	<link rel="stylesheet" href="depgraph.css">
+</head>
+<body>
+    <div class="container">
+		<div class="row">
+			<div class="col-md-12">
+                <h2>Package Dependency Graph for npm</h2>
+				<input type="text" id="package-input" class="form-control" placeholder="Type a package name">
+				<div id="sprotty" class="content-widget"></div>
+			</div>
+		</div>
+	</div>
+	
+	<footer class="footer">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-6">
+					Brought to you by <a href="https://typefox.io">TypeFox</a>.
+				</div>
+				<div class="col-md-6 text-right">
+					Powered by <a href="https://github.com/theia-ide/sprotty">sprotty</a>
+					and <a href="https://www.eclipse.org/elk/">ELK</a>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+	<script src="bundle.js"></script>
+	<script src="jquery/jquery.slim.min.js"></script>
+	<script src="bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>
