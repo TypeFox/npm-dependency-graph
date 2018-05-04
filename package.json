@@ -9,6 +9,10 @@
     "lerna": "2.4.0"
   },
   "workspaces": [
-    "npm-dependency-graph-extension", "browser-app", "electron-app"
+    "sprotty/client",
+    "npm-dependency-graph-extension",
+    "browser-app",
+    "electron-app",
+    "standalone-app"
   ]
 }

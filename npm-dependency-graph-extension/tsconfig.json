@@ -12,6 +12,9 @@
             "es6",
             "dom"
         ],
+        "typeRoots": [
+            "typings"
+        ],
         "sourceMap": true,
         "rootDir": "src",
         "outDir": "lib"

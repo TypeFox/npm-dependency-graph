@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "name": "standalone-app",
+  "version": "0.0.0",
+  "dependencies": {
+    "npm-dependency-graph-extension": "0.0.0",
+    "reflect-metadata": "^0.1.12"
+  },
+  "scripts": {},
+  "devDependencies": {
+    "webpack": "^4.6.0"
+  }
+}
