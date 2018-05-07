@@ -15,12 +15,13 @@ import {
     moveModule, boundsModule, fadeModule, viewportModule, exportModule, hoverModule
 } from 'sprotty/lib';
 import { DependencyGraphNode, DependencyGraphEdge } from './graph-model';
-import { DependencyGraphGenerator } from './graph-generator';
+import { IGraphGenerator } from './graph-generator';
 import { DepGraphModelSource } from './model-source';
+import { NpmDependencyGraphGenerator } from './npm-dependencies';
 
 export default () => {
     const depGraphModule = new ContainerModule((bind, unbind, isBound, rebind) => {
-        bind(DependencyGraphGenerator).toSelf().inSingletonScope();
+        bind(IGraphGenerator).to(NpmDependencyGraphGenerator).inSingletonScope();
         bind(TYPES.ModelSource).to(DepGraphModelSource).inSingletonScope();
         rebind(TYPES.ILogger).to(ConsoleLogger).inSingletonScope();
         rebind(TYPES.LogLevel).toConstantValue(LogLevel.warn);

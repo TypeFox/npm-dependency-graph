@@ -12,7 +12,7 @@ import {
     LocalModelSource, ComputedBoundsAction, TYPES, IActionDispatcher, ActionHandlerRegistry, ViewerOptions,
     PopupModelFactory, IStateAwareModelProvider, SGraphSchema, ILogger
 } from "sprotty/lib";
-import { DependencyGraphGenerator } from "./graph-generator";
+import { IGraphGenerator } from "./graph-generator";
 import { elkLayout } from "./graph-layout";
 
 @injectable()
@@ -21,7 +21,7 @@ export class DepGraphModelSource extends LocalModelSource {
     constructor(@inject(TYPES.IActionDispatcher) actionDispatcher: IActionDispatcher,
         @inject(TYPES.ActionHandlerRegistry) actionHandlerRegistry: ActionHandlerRegistry,
         @inject(TYPES.ViewerOptions) viewerOptions: ViewerOptions,
-        @inject(DependencyGraphGenerator) private graphGenerator: DependencyGraphGenerator,
+        @inject(IGraphGenerator) private graphGenerator: IGraphGenerator,
         @inject(TYPES.ILogger) private logger: ILogger,
         @inject(TYPES.PopupModelFactory)@optional() popupModelFactory?: PopupModelFactory,
         @inject(TYPES.StateAwareModelProvider)@optional() modelProvider?: IStateAwareModelProvider
