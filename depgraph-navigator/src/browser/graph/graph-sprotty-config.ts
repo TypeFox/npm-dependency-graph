@@ -13,7 +13,7 @@ import {
     SGraphView, HtmlRoot, HtmlRootView, PreRenderedElement, PreRenderedView, SLabel,
     SLabelView, SCompartment, SCompartmentView, defaultModule, selectModule,
     moveModule, boundsModule, fadeModule, viewportModule, exportModule, hoverModule,
-    ActionHandlerRegistry, SelectCommand
+    ActionHandlerRegistry, SelectCommand, edgeEditModule
 } from 'sprotty/lib';
 import { DependencyGraphNode, DependencyGraphEdge } from './graph-model';
 import { IGraphGenerator } from './graph-generator';
@@ -22,11 +22,13 @@ import { NpmDependencyGraphGenerator } from './npm-dependencies';
 import { ResolveNodesHandler } from './resolve-nodes';
 import { DependencyNodeView, DependencyEdgeView } from './graph-views';
 import { popupModelFactory } from './popup-info';
+import { ElkGraphLayout } from './graph-layout';
 
 export default () => {
     const depGraphModule = new ContainerModule((bind, unbind, isBound, rebind) => {
-        bind(IGraphGenerator).to(NpmDependencyGraphGenerator).inSingletonScope();
         bind(ResolveNodesHandler).toSelf();
+        bind(ElkGraphLayout).toSelf();
+        bind(IGraphGenerator).to(NpmDependencyGraphGenerator).inSingletonScope();
         bind(TYPES.ModelSource).to(DepGraphModelSource).inSingletonScope();
         bind(TYPES.PopupModelFactory).toConstantValue(popupModelFactory);
         rebind(TYPES.ILogger).to(ConsoleLogger).inSingletonScope();
@@ -44,7 +46,7 @@ export default () => {
 
     const container = new Container();
     container.load(defaultModule, selectModule, moveModule, boundsModule, fadeModule, viewportModule,
-        exportModule, hoverModule, depGraphModule);
+        exportModule, hoverModule, edgeEditModule, depGraphModule);
     
     const actionHandlerRegistry = container.get<ActionHandlerRegistry>(TYPES.ActionHandlerRegistry);
     actionHandlerRegistry.register(SelectCommand.KIND, container.get(ResolveNodesHandler));

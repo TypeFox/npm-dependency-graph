@@ -12,7 +12,7 @@ export function popupModelFactory(request: RequestPopupModelAction, element?: SM
     if (element && element.type === 'node') {
         const node = element as DependencyGraphNodeSchema;
         const versions = node.versions.length > 0 ? `<span class="popup-info-version">${node.versions.join(', ')}</span>`: '';
-        const body = node.error? node.error : node.description;
+        const body = node.error? node.error : node.description ? node.description : '';
         return {
             type: 'html',
             id: 'popup',

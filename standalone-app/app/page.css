@@ -9,7 +9,13 @@
 
 input {
     width: 100%;
+    margin-top: 20px;
     margin-bottom: 20px;
+}
+
+#loading-indicator {
+    position: absolute;
+    color: #66a;
 }
 
 .content-widget {
@@ -41,5 +47,6 @@ svg {
 }
 
 .popup-info-version {
+    margin-left: 12px;
     color: #aaa;
 }

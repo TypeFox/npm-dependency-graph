@@ -39,6 +39,12 @@ export interface DependencyGraphEdgeSchema extends SEdgeSchema {
 export class DependencyGraphEdge extends SEdge {
     optional: boolean = false;
 
+    constructor() {
+        super();
+        this.sourceAnchorCorrection = 1;
+        this.targetAnchorCorrection = 1.5;
+    }
+
     hasFeature(feature: symbol): boolean {
         if (feature === editFeature)
             return false;

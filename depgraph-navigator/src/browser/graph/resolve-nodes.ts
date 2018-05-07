@@ -17,7 +17,7 @@ export class ResolveNodesHandler implements IActionHandler {
 
     constructor(@inject(TYPES.ModelSource) protected readonly modelSource: DepGraphModelSource) {}
 
-    handle(action: Action): Action | undefined {
+    handle(action: Action): void {
         if ((action as any).selectedElementsIDs) {
             const select = action as SelectAction;
             const nodes: DependencyGraphNodeSchema[] = [];
@@ -26,8 +26,9 @@ export class ResolveNodesHandler implements IActionHandler {
                 if (element && element.type === 'node')
                     nodes.push(element as DependencyGraphNodeSchema);
             });
-            this.modelSource.resolveNodes(nodes);
-            return new CenterAction(select.selectedElementsIDs);
+            if (nodes.length > 0) {
+                this.modelSource.resolveNodes(nodes);
+            }
         }
     }
 }

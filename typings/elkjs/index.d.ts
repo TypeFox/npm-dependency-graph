@@ -1,5 +1,9 @@
 declare module "elkjs/lib/elk-api" {
 
+    export interface LayoutOptions {
+        [key: string]: string
+    }
+
     export interface ElkPoint {
         x: number
         y: number
@@ -8,6 +12,7 @@ declare module "elkjs/lib/elk-api" {
     export interface ElkGraphElement {
         id: string
         labels?: ElkLabel[]
+        layoutOptions?: LayoutOptions
     }
     
     export interface ElkShape extends ElkGraphElement {
@@ -59,15 +64,34 @@ declare module "elkjs/lib/elk-api" {
         outgoingSections?: string[]
     }
 
-    export interface ELK {
-        layout(graph: ElkNode): Promise<void>;
+    export interface ELKLayoutArguments {
+        layoutOptions?: LayoutOptions
     }
+
+    export interface ELK {
+        layout(graph: ElkNode, args?: ELKLayoutArguments): Promise<ElkNode>;
+    }
+
+    export interface ELKConstructorArguments {
+        defaultLayoutOptions?: LayoutOptions
+        algorithms?: string[]
+        workerUrl?: string
+    }
+
     const elk: {
-        new(args?: { workerUrl: string }): ELK;
+        new(args?: ELKConstructorArguments): ELK;
     };
     export default elk;
 }
 
 declare module "elkjs" {
     export * from "elkjs/lib/elk-api";
+    import elk from "elkjs/lib/elk-api";
+    export default elk;
+}
+
+declare module "elkjs/lib/elk.bundled" {
+    export * from "elkjs/lib/elk-api";
+    import elk from "elkjs/lib/elk-api";
+    export default elk;
 }

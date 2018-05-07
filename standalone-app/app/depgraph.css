@@ -25,17 +25,27 @@
 
 .sprotty-edge {
     fill: none;
-    stroke: #224;
+    stroke: #777;
     stroke-width: 1;
 }
 
-.sprotty-edge.arrow {
-    fill: #336;
+.sprotty-edge > .arrow {
+    fill: #777;
+}
+
+.sprotty-edge.optional {
+    fill: none;
+    stroke: #bbb;
+    stroke-width: 1;
+}
+
+.sprotty-edge.optional > .arrow {
+    fill: #bbb;
 }
 
 .sprotty-label {
     stroke-width: 0;
-    fill: #000;
+    fill: #333;
     font-family: sans-serif;
     font-size: 10pt;
     dominant-baseline: hanging;

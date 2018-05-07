@@ -14,7 +14,7 @@ import { IGraphGenerator } from "./graph-generator";
 import { DependencyGraphNodeSchema, DependencyGraphEdgeSchema } from "./graph-model";
 import { PackageMetadata, VersionMetadata } from "./registry-metadata";
 
-const REGISTRY_URL = 'http://registry.npmjs.org';
+const REGISTRY_URL = 'https://registry.npmjs.org';
 
 @injectable()
 export class NpmDependencyGraphGenerator implements IGraphGenerator {
@@ -81,9 +81,19 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.open('GET', url, true);
-            xhr.addEventListener('load', () => resolve(JSON.parse(xhr.responseText)));
-            xhr.addEventListener('error', () => reject(xhr.statusText ? xhr.statusText
-                : new Error('Could not load package metadata from ' + url)));
+            const errorHandler = () => {
+                let message = `Could not load package metadata from ${url}`;
+                if (xhr.statusText)
+                    message += ` (${xhr.statusText})`
+                reject(new Error(message));
+            };
+            xhr.addEventListener('load', () => {
+                if (xhr.status === 200)
+                    resolve(JSON.parse(xhr.responseText);
+                else
+                    errorHandler();
+            });
+            xhr.addEventListener('error', errorHandler);
             xhr.send();
         });
     }

@@ -10,31 +10,43 @@
 import { injectable, inject, optional } from "inversify";
 import {
     LocalModelSource, ComputedBoundsAction, TYPES, IActionDispatcher, ActionHandlerRegistry, ViewerOptions,
-    PopupModelFactory, IStateAwareModelProvider, SGraphSchema, ILogger, SelectAction
+    PopupModelFactory, IStateAwareModelProvider, SGraphSchema, ILogger, SelectAction, CenterAction
 } from "sprotty/lib";
 import { IGraphGenerator } from "./graph-generator";
-import { elkLayout } from "./graph-layout";
+import { ElkGraphLayout } from "./graph-layout";
 import { DependencyGraphNodeSchema } from "./graph-model";
 
 @injectable()
 export class DepGraphModelSource extends LocalModelSource {
 
     private pendingSelection: string[] = [];
+    private pendingCenter: string[] = [];
+
+    loadIndicator?: (loadStatus: boolean) => void;
 
     constructor(@inject(TYPES.IActionDispatcher) actionDispatcher: IActionDispatcher,
         @inject(TYPES.ActionHandlerRegistry) actionHandlerRegistry: ActionHandlerRegistry,
         @inject(TYPES.ViewerOptions) viewerOptions: ViewerOptions,
         @inject(IGraphGenerator) public readonly graphGenerator: IGraphGenerator,
-        @inject(TYPES.ILogger) private readonly logger: ILogger,
+        @inject(ElkGraphLayout) protected readonly elk: ElkGraphLayout,
+        @inject(TYPES.ILogger) protected readonly logger: ILogger,
         @inject(TYPES.PopupModelFactory)@optional() popupModelFactory?: PopupModelFactory,
         @inject(TYPES.StateAwareModelProvider)@optional() modelProvider?: IStateAwareModelProvider
     ) {
         super(actionDispatcher, actionHandlerRegistry, viewerOptions, popupModelFactory, modelProvider);
         this.onModelSubmitted = (newRoot) => {
+            if (this.loadIndicator) {
+                this.loadIndicator(false);
+            }
             const selection = this.pendingSelection;
             if (selection.length > 0) {
                 this.actionDispatcher.dispatch(new SelectAction(selection));
                 this.pendingSelection = [];
+            }
+            const center = this.pendingCenter;
+            if (center.length > 0) {
+                this.actionDispatcher.dispatch(new CenterAction(center));
+                this.pendingCenter = [];
             }
         };
     }
@@ -50,12 +62,16 @@ export class DepGraphModelSource extends LocalModelSource {
     }
 
     async resolveNodes(nodes: DependencyGraphNodeSchema[]): Promise<void> {
+        if (this.loadIndicator) {
+            this.loadIndicator(true);
+        }
         for (const node of nodes) {
             try {
                 await this.graphGenerator.resolveNode(node);
             } catch (error) {
                 node.error = error.toString();
             }
+            this.pendingCenter.push(node.id);
         }
         this.updateModel();
     }
@@ -77,7 +93,7 @@ export class DepGraphModelSource extends LocalModelSource {
         }
 
         // Compute a layout with elkjs
-        elkLayout(root as SGraphSchema, index).then(() => {
+        this.elk.layout(root as SGraphSchema, index).then(() => {
             this.doSubmitModel(root, true);
         }).catch(error => {
             this.logger.error(this, error.toString());
