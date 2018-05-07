@@ -8,16 +8,16 @@
  */
 
 import { SGraphSchema, SModelIndex, SModelElementSchema } from "sprotty/lib";
-import { PackageNode } from "./graph-model";
+import { DependencyGraphNodeSchema } from "./graph-model";
 
 export interface IGraphGenerator {
 
     readonly graph: SGraphSchema
     readonly index: SModelIndex<SModelElementSchema>
 
-    generateNode(name: string, version?: string): PackageNode;
+    generateNode(name: string, version?: string): DependencyGraphNodeSchema;
 
-    resolveNode(node: PackageNode): Promise<SGraphSchema>;
+    resolveNode(node: DependencyGraphNodeSchema): Promise<SGraphSchema>;
 
 }
 

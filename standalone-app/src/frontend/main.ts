@@ -19,6 +19,6 @@ modelSource.start();
 const input = jQuery('#package-input');
 input.keydown(event => {
     if (event.keyCode === 13) { // Enter
-        modelSource.addPackageNode(input.val() as string);
+        modelSource.createNode(input.val() as string);
     }
 });

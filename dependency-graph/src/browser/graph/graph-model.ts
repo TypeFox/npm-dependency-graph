@@ -9,11 +9,12 @@
 
 import { RectangularNode, moveFeature, SEdge, editFeature, SNodeSchema, SEdgeSchema } from "sprotty/lib";
 
-export interface PackageNode extends SNodeSchema {
+export interface DependencyGraphNodeSchema extends SNodeSchema {
     name: string
     versions: string[]
     description?: string
     resolved?: boolean
+    error?: string
 }
 
 export class DependencyGraphNode extends RectangularNode {
@@ -21,6 +22,7 @@ export class DependencyGraphNode extends RectangularNode {
     versions: string[] = [];
     description?: string;
     resolved: boolean = false;
+    error?: string;
 
     hasFeature(feature: symbol): boolean {
         if (feature === moveFeature)
@@ -30,11 +32,13 @@ export class DependencyGraphNode extends RectangularNode {
     }
 }
 
-export interface PackageDependency extends SEdgeSchema {
+export interface DependencyGraphEdgeSchema extends SEdgeSchema {
     optional?: boolean
 }
 
 export class DependencyGraphEdge extends SEdge {
+    optional: boolean = false;
+
     hasFeature(feature: symbol): boolean {
         if (feature === editFeature)
             return false;

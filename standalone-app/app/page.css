@@ -30,3 +30,16 @@ svg {
     width: 100%;
     height: 500px;
 }
+
+.sprotty-popup-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.sprotty-popup-body.error {
+    color: #a00;
+}
+
+.popup-info-version {
+    color: #aaa;
+}

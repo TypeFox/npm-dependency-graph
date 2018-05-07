@@ -7,9 +7,11 @@
     "bootstrap": "^4.1.1",
     "express": "^4.16.3",
     "dependency-graph": "0.0.0",
+    "jquery": "^3.3.1",
     "reflect-metadata": "^0.1.12"
   },
   "devDependencies": {
+    "@types/jquery": "^3.3.1",
     "rimraf": "latest",
     "typescript": "latest",
     "uglify-loader": "^2.0.0",

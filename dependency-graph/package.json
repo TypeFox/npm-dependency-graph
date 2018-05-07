@@ -13,12 +13,10 @@
   "dependencies": {
     "@theia/core": "latest",
     "elkjs": "^0.3.0",
-    "jquery": "^3.3.1",
     "semver": "^5.5.0",
     "sprotty": "0.3.0"
   },
   "devDependencies": {
-    "@types/jquery": "^3.3.1",
     "rimraf": "latest",
     "typescript": "latest"
   },

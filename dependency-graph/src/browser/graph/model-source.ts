@@ -10,31 +10,53 @@
 import { injectable, inject, optional } from "inversify";
 import {
     LocalModelSource, ComputedBoundsAction, TYPES, IActionDispatcher, ActionHandlerRegistry, ViewerOptions,
-    PopupModelFactory, IStateAwareModelProvider, SGraphSchema, ILogger
+    PopupModelFactory, IStateAwareModelProvider, SGraphSchema, ILogger, SelectAction
 } from "sprotty/lib";
 import { IGraphGenerator } from "./graph-generator";
 import { elkLayout } from "./graph-layout";
+import { DependencyGraphNodeSchema } from "./graph-model";
 
 @injectable()
 export class DepGraphModelSource extends LocalModelSource {
 
+    private pendingSelection: string[] = [];
+
     constructor(@inject(TYPES.IActionDispatcher) actionDispatcher: IActionDispatcher,
         @inject(TYPES.ActionHandlerRegistry) actionHandlerRegistry: ActionHandlerRegistry,
         @inject(TYPES.ViewerOptions) viewerOptions: ViewerOptions,
-        @inject(IGraphGenerator) private graphGenerator: IGraphGenerator,
-        @inject(TYPES.ILogger) private logger: ILogger,
+        @inject(IGraphGenerator) public readonly graphGenerator: IGraphGenerator,
+        @inject(TYPES.ILogger) private readonly logger: ILogger,
         @inject(TYPES.PopupModelFactory)@optional() popupModelFactory?: PopupModelFactory,
         @inject(TYPES.StateAwareModelProvider)@optional() modelProvider?: IStateAwareModelProvider
     ) {
         super(actionDispatcher, actionHandlerRegistry, viewerOptions, popupModelFactory, modelProvider);
+        this.onModelSubmitted = (newRoot) => {
+            const selection = this.pendingSelection;
+            if (selection.length > 0) {
+                this.actionDispatcher.dispatch(new SelectAction(selection));
+                this.pendingSelection = [];
+            }
+        };
     }
 
     start(): void {
         this.setModel(this.graphGenerator.graph);
     }
 
-    addPackageNode(name: string, version?: string): void {
-        this.graphGenerator.generateNode(name, version);
+    createNode(name: string, version?: string): void {
+        const node = this.graphGenerator.generateNode(name, version);
+        this.pendingSelection.push(node.id);
+        this.updateModel();
+    }
+
+    async resolveNodes(nodes: DependencyGraphNodeSchema[]): Promise<void> {
+        for (const node of nodes) {
+            try {
+                await this.graphGenerator.resolveNode(node);
+            } catch (error) {
+                node.error = error.toString();
+            }
+        }
         this.updateModel();
     }
 
