@@ -2,7 +2,7 @@
  * Generated using theia-extension-generator
  */
 
-import { NpmDependencyGraphCommandContribution, NpmDependencyGraphMenuContribution } from './npm-dependency-graph-contribution';
+import { NpmDependencyGraphCommandContribution, NpmDependencyGraphMenuContribution } from './dependency-graph-contribution';
 import {
     CommandContribution,
     MenuContribution

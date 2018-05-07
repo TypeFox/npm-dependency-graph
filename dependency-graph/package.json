@@ -1,5 +1,5 @@
 {
-  "name": "npm-dependency-graph-extension",
+  "name": "dependency-graph",
   "description": "A Theia extension that visualizes npm package dependencies",
   "license": "Apache-2.0",
   "keywords": [
@@ -30,7 +30,7 @@
   },
   "theiaExtensions": [
     {
-      "frontend": "lib/browser/npm-dependency-graph-frontend-module"
+      "frontend": "lib/browser/dependency-graph-frontend-module"
     }
   ]
 }

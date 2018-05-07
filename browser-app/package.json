@@ -16,7 +16,7 @@
     "@theia/monaco": "latest",
     "@theia/typescript": "latest",
     "@theia/messages": "latest",
-    "npm-dependency-graph-extension": "0.0.0"
+    "dependency-graph": "0.0.0"
   },
   "devDependencies": {
     "@theia/cli": "latest"

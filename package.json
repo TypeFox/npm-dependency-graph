@@ -10,7 +10,7 @@
   },
   "workspaces": [
     "sprotty/client",
-    "npm-dependency-graph-extension",
+    "dependency-graph",
     "browser-app",
     "electron-app",
     "standalone-app"
