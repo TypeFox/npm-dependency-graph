@@ -16,7 +16,7 @@
     "@theia/monaco": "latest",
     "@theia/typescript": "latest",
     "@theia/messages": "latest",
-    "dependency-graph": "0.0.0"
+    "depgraph-navigator": "0.0.0"
   },
   "devDependencies": {
     "@theia/cli": "latest"

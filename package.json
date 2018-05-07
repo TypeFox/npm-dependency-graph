@@ -10,7 +10,7 @@
   },
   "workspaces": [
     "sprotty/client",
-    "dependency-graph",
+    "depgraph-navigator",
     "browser-app",
     "electron-app",
     "standalone-app"

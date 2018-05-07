@@ -10,7 +10,7 @@
 import 'reflect-metadata'
 import * as jQuery from 'jquery';
 import { TYPES } from 'sprotty/lib';
-import { containerFactory, DepGraphModelSource } from 'dependency-graph/lib/browser';
+import { containerFactory, DepGraphModelSource } from 'depgraph-navigator/lib/browser';
 
 const container = containerFactory();
 const modelSource = container.get<DepGraphModelSource>(TYPES.ModelSource);
