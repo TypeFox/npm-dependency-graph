@@ -14,7 +14,7 @@ import { IGraphGenerator } from "./graph-generator";
 import { DependencyGraphNodeSchema, DependencyGraphEdgeSchema } from "./graph-model";
 import { PackageMetadata, VersionMetadata } from "./registry-metadata";
 
-const REGISTRY_URL = 'https://registry.npmjs.org';
+export const REGISTRY_URL = 'https://registry.npmjs.org';
 
 @injectable()
 export class NpmDependencyGraphGenerator implements IGraphGenerator {
@@ -89,7 +89,7 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
             };
             xhr.addEventListener('load', () => {
                 if (xhr.status === 200)
-                    resolve(JSON.parse(xhr.responseText);
+                    resolve(JSON.parse(xhr.responseText));
                 else
                     errorHandler();
             });

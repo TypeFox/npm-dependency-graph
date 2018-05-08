@@ -8,7 +8,7 @@
  */
 
 import { injectable, inject } from 'inversify';
-import { IActionHandler, Action, SelectAction, TYPES, CenterAction } from 'sprotty/lib';
+import { IActionHandler, Action, SelectAction, TYPES } from 'sprotty/lib';
 import { DepGraphModelSource } from './model-source';
 import { DependencyGraphNodeSchema } from './graph-model';
 

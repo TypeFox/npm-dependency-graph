@@ -431,6 +431,10 @@
   dependencies:
     "@types/node" "*"
 
+"@types/jquery@^2.0.32":
+  version "2.0.49"
+  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-2.0.49.tgz#95bd7064caebf65bde10429dff491a1aea05b67d"
+
 "@types/jquery@^3.3.1":
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.1.tgz#55758d44d422756d6329cbf54e6d41931d7ba28f"
@@ -2815,6 +2819,13 @@ detect-libc@^1.0.2, detect-libc@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-1.0.3.tgz#fa137c4bd698edf55cd5cd02ac559f91a4c4ba9b"
 
+devbridge-autocomplete@^1.4.7:
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/devbridge-autocomplete/-/devbridge-autocomplete-1.4.7.tgz#de003a1d3ceb2342f4a98bc64ef19db5fbff83f9"
+  dependencies:
+    "@types/jquery" "^2.0.32"
+    jquery ">=1.7"
+
 diff@3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/diff/-/diff-3.2.0.tgz#c9ce393a4b7cbd0b058a725c93df299027868ff9"
@@ -4705,7 +4716,7 @@ jenkins-mocha@^4.1.2:
     shelljs "^0.7.5"
     spec-xunit-file "0.0.1-3"
 
-jquery@^3.3.1:
+jquery@>=1.7, jquery@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 

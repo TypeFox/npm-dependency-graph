@@ -12,3 +12,4 @@ export { containerFactory };
 
 export * from './graph/graph-generator';
 export * from './graph/model-source';
+export * from './graph/npm-dependencies';

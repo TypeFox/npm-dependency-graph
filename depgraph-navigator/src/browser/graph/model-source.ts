@@ -56,9 +56,12 @@ export class DepGraphModelSource extends LocalModelSource {
     }
 
     createNode(name: string, version?: string): void {
+        const isNew = this.graphGenerator.index.getById(name) === undefined;
         const node = this.graphGenerator.generateNode(name, version);
-        this.pendingSelection.push(node.id);
-        this.updateModel();
+        if (isNew) {
+            this.pendingSelection.push(node.id);
+            this.updateModel();
+        }
     }
 
     async resolveNodes(nodes: DependencyGraphNodeSchema[]): Promise<void> {

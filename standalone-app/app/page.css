@@ -50,3 +50,19 @@ svg {
     margin-left: 12px;
     color: #aaa;
 }
+
+.autocomplete-suggestions { 
+    border: 1px solid #aaa;
+    background: #f0f0f0;
+    overflow: auto;
+}
+
+.autocomplete-suggestion { 
+    padding: 2px 5px; 
+    white-space: nowrap; 
+    overflow: hidden; 
+}
+
+.autocomplete-selected { 
+    background: #ddf; 
+}
