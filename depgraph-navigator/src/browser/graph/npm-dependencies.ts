@@ -76,6 +76,8 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
                     this.addDependencies(node, versionData.dependencies);
                 if (versionData.optionalDependencies)
                     this.addDependencies(node, versionData.optionalDependencies, true);
+                if (versionData.peerDependencies)
+                    this.addDependencies(node, versionData.peerDependencies, true);
                 node.resolved = true;
             }
             return this.graph;
@@ -125,8 +127,10 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
                 sourceId: node.id,
                 targetId: depNode.id
             };
-            this.graph.children.push(depEdge);
-            this.index.add(depEdge);
+            if (!this.index.contains(depEdge)) {
+                this.graph.children.push(depEdge);
+                this.index.add(depEdge);
+            }
         }
     }
 

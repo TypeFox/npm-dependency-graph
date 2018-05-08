@@ -10,7 +10,7 @@
 import { injectable, inject, optional } from "inversify";
 import {
     LocalModelSource, ComputedBoundsAction, TYPES, IActionDispatcher, ActionHandlerRegistry, ViewerOptions,
-    PopupModelFactory, IStateAwareModelProvider, SGraphSchema, ILogger, SelectAction, CenterAction
+    PopupModelFactory, IStateAwareModelProvider, SGraphSchema, ILogger, SelectAction, FitToScreenAction
 } from "sprotty/lib";
 import { IGraphGenerator } from "./graph-generator";
 import { ElkGraphLayout } from "./graph-layout";
@@ -40,15 +40,29 @@ export class DepGraphModelSource extends LocalModelSource {
             }
             const selection = this.pendingSelection;
             if (selection.length > 0) {
-                this.actionDispatcher.dispatch(new SelectAction(selection));
+                this.select(selection);
                 this.pendingSelection = [];
             }
             const center = this.pendingCenter;
             if (center.length > 0) {
-                this.actionDispatcher.dispatch(new CenterAction(center));
+                this.center(center);
                 this.pendingCenter = [];
             }
         };
+    }
+
+    select(elementIds: string[]): void {
+        this.actionDispatcher.dispatch(new SelectAction(elementIds));
+    }
+
+    center(elementIds: string[]): void {
+        this.actionDispatcher.dispatch(<FitToScreenAction>{
+            elementIds,
+            kind: 'fit',
+            padding: 20,
+            maxZoom: 1,
+            animate: true
+        });
     }
 
     start(): void {
@@ -65,18 +79,22 @@ export class DepGraphModelSource extends LocalModelSource {
     }
 
     async resolveNodes(nodes: DependencyGraphNodeSchema[]): Promise<void> {
-        if (this.loadIndicator) {
-            this.loadIndicator(true);
-        }
-        for (const node of nodes) {
-            try {
-                await this.graphGenerator.resolveNode(node);
-            } catch (error) {
-                node.error = error.toString();
+        if (nodes.every(n => !!n.resolved)) {
+            this.center(nodes.map(n => n.id));
+        } else {
+            if (this.loadIndicator) {
+                this.loadIndicator(true);
             }
-            this.pendingCenter.push(node.id);
+            for (const node of nodes) {
+                try {
+                    await this.graphGenerator.resolveNode(node);
+                } catch (error) {
+                    node.error = error.toString();
+                }
+                this.pendingCenter.push(node.id);
+            }
+            this.updateModel();
         }
-        this.updateModel();
     }
 
     clear(): void {

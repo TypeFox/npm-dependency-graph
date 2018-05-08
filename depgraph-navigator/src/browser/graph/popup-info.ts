@@ -19,7 +19,7 @@ export function popupModelFactory(request: RequestPopupModelAction, element?: SM
 
         let title: string;
         if (node.url)
-            title = `<a href="${node.url}">${node.name}${versions}</a>`;
+            title = `<a href="${node.url}">${node.name}</a>${versions}`;
         else
             title = `${node.name}${versions}`;
 

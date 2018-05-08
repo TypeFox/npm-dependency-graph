@@ -27,16 +27,19 @@
     fill: none;
     stroke: #777;
     stroke-width: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .sprotty-edge > .arrow {
+    stroke: none;
     fill: #777;
 }
 
 .sprotty-edge.optional {
     fill: none;
     stroke: #bbb;
-    stroke-width: 1;
+    stroke-dasharray: 5,5;
 }
 
 .sprotty-edge.optional > .arrow {
