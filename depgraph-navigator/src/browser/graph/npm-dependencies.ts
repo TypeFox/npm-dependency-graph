@@ -65,7 +65,7 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
         if (node.resolved) {
             return Promise.resolve(this.graph);
         }
-        const nameUrlComponent = encodeURIComponent(node.name);
+        const nameUrlComponent = node.name.replace(/\//g, '%2F');
         const path = `${this.registryUrl}/${nameUrlComponent}`;
         return this.request(path).then((data: PackageMetadata) => {
             node.description = data.description;

@@ -8,26 +8,33 @@
  */
 
 import 'reflect-metadata';
+import 'bootstrap';
 import 'devbridge-autocomplete';
 import * as jQuery from 'jquery';
-import fontawesome from '@fortawesome/fontawesome'
 import * as faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
+import * as faExclamationCircle from '@fortawesome/fontawesome-free-solid/faExclamationCircle'
+import fontawesome from '@fortawesome/fontawesome'
 import { TYPES } from 'sprotty/lib';
 import { containerFactory, DepGraphModelSource, REGISTRY_URL } from 'depgraph-navigator/lib/browser';
 
-fontawesome.library.add(faSpinner);
+fontawesome.library.add(faSpinner, faExclamationCircle);
 
+const input = jQuery('#package-input');
+const loadingIndicator = jQuery('#loading-indicator');
+const errorIndicator = jQuery('#error-indicator');
+
+//---------------------------------------------------------
 // Create sprotty container and initialize model source
 const container = containerFactory();
 const modelSource = container.get<DepGraphModelSource>(TYPES.ModelSource);
 modelSource.loadIndicator = loading => {
-    jQuery('#loading-indicator').css({ visibility: loading ? 'visible' : 'hidden' });
+    loadingIndicator.css({ visibility: loading ? 'visible' : 'hidden' });
 };
 modelSource.start();
 
+//---------------------------------------------------------
 // Set up input field with autocomplete
 const SEARCH_SIZE = 12;
-const input = jQuery('#package-input');
 input.autocomplete({
     serviceUrl: REGISTRY_URL + '/-/v1/search',
     paramName: 'text',
@@ -46,19 +53,65 @@ input.autocomplete({
         });
         return { suggestions };
     },
+    onSearchComplete: (query, suggestions) => {
+        if (suggestions.length === 0)
+            setErrorMessage(`No package found for search query: ${query}`);
+    },
+    onSearchError: (query, jqXHR, textStatus, errorThrown) => {
+        if (textStatus !== 'abort') {
+            let message = 'Search request to package registry failed';
+            if (textStatus)
+                message += ` (${textStatus})`;
+            setErrorMessage(message);
+        }
+    },
     onSelect: (suggestion) => {
         modelSource.createNode(suggestion.value);
-        jQuery('#sprotty').focus()
+        jQuery('#sprotty>svg').focus();
     }
 });
+input.keydown(event => clearErrorMessage());
 jQuery(() => input.focus());
 
-// Layout: put the loading indicator onto the input field
-const updateLoadingIndicatorBounds = () => {
-    jQuery('#loading-indicator').offset({
-        top: input.offset()!.top + 3,
-        left: input.offset()!.left + input.width()! - 12
+//---------------------------------------------------------
+// Manage the error indicator icon and its popup box
+let errorMessageTimeout: number;
+let errorVisible = false;
+const setErrorMessage = (message: string) => {
+    if (errorMessageTimeout)
+        window.clearTimeout(errorMessageTimeout);
+    errorMessageTimeout = window.setTimeout(() => {
+        errorIndicator.attr({ 'data-content': message }).css({ visibility: 'visible' });
+        errorVisible = true;
+    }, 500);
+}
+const clearErrorMessage = () => {
+    if (errorMessageTimeout)
+        window.clearTimeout(errorMessageTimeout);
+    if (errorVisible) {
+        errorIndicator.css({ visibility: 'hidden' });
+        errorIndicator.popover('hide');
+        errorVisible = false;
+    }
+}
+errorIndicator.popover({
+    trigger: 'hover',
+    placement: 'bottom'
+});
+
+//---------------------------------------------------------
+// Layout: position the indicator icons onto the input field
+const updateIndicatorBounds = () => {
+    const verticalOffset = 3;
+    const horizontalOffset = -12;
+    loadingIndicator.offset({
+        top: input.offset()!.top + verticalOffset,
+        left: input.offset()!.left + input.width()! + horizontalOffset
+    });
+    errorIndicator.offset({
+        top: input.offset()!.top + verticalOffset,
+        left: input.offset()!.left + input.width()! + horizontalOffset
     });
 }
-jQuery(updateLoadingIndicatorBounds);
-jQuery(window).resize(updateLoadingIndicatorBounds);
+jQuery(updateIndicatorBounds);
+jQuery(window).resize(updateIndicatorBounds);

@@ -15,7 +15,12 @@ input {
 
 #loading-indicator {
     position: absolute;
-    color: #66a;
+    color: #66c;
+}
+
+#error-indicator {
+    position: absolute;
+    color: #c66;
 }
 
 .content-widget {

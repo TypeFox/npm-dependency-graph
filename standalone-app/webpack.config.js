@@ -33,7 +33,7 @@ module.exports = function(env) {
             loaders: env.uglify ? [
                 {
                     test: /.*\.js$/,
-                    exclude: /snabbdom\/es|fontawesome\/index.es.js/,
+                    exclude: /snabbdom\/es|fontawesome\/index.es.js|popper.js\/dist\/esm/,
                     loader: 'uglify-loader'
                 }
             ] : []
