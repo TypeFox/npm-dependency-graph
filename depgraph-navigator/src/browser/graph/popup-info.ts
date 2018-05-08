@@ -11,8 +11,32 @@ import { DependencyGraphNodeSchema } from "./graph-model";
 export function popupModelFactory(request: RequestPopupModelAction, element?: SModelElementSchema): SModelRootSchema | undefined {
     if (element && element.type === 'node') {
         const node = element as DependencyGraphNodeSchema;
-        const versions = node.versions.length > 0 ? `<span class="popup-info-version">${node.versions.join(', ')}</span>`: '';
-        const body = node.error? node.error : node.description ? node.description : '';
+        const titleClass = 'sprotty-popup-title';
+
+        let versions = '';
+        if (node.versions.length > 0)
+            versions = `<span class="popup-info-version">${node.versions.join(', ')}</span>`;
+
+        let title: string;
+        if (node.url)
+            title = `<a href="${node.url}">${node.name}${versions}</a>`;
+        else
+            title = `${node.name}${versions}`;
+
+        let bodyClass = 'sprotty-popup-body';
+        if (node.error)
+            bodyClass += ' error';
+        else if (!node.resolved)
+            bodyClass += ' unresolved';
+
+        let body = '';
+        if (node.error)
+            body = node.error;
+        else if (node.description)
+            body = node.description;
+        else if (!node.resolved)
+            body = 'This package has not been resolved yet. Select it to trigger resolution of package metadata.';
+
         return {
             type: 'html',
             id: 'popup',
@@ -20,12 +44,12 @@ export function popupModelFactory(request: RequestPopupModelAction, element?: SM
                 <PreRenderedElementSchema> {
                     type: 'pre-rendered',
                     id: 'popup-title',
-                    code: `<div class="sprotty-popup-title">${node.name}${versions}</div>`
+                    code: `<div class="${titleClass}">${title}</div>`
                 },
                 <PreRenderedElementSchema> {
                     type: 'pre-rendered',
                     id: 'popup-body',
-                    code: `<div class="sprotty-popup-body${node.error ? ' error' : ''}">${body}</div>`
+                    code: `<div class="${bodyClass}">${body}</div>`
                 }
             ]
         };

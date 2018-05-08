@@ -26,19 +26,14 @@ modelSource.loadIndicator = loading => {
 modelSource.start();
 
 // Set up input field with autocomplete
-const input = jQuery('#package-input');
-input.keydown(event => {
-    if (event.keyCode === 13) { // Enter
-        modelSource.createNode(input.val() as string);
-        jQuery('#sprotty').focus()
-    }
-});
 const SEARCH_SIZE = 12;
+const input = jQuery('#package-input');
 input.autocomplete({
     serviceUrl: REGISTRY_URL + '/-/v1/search',
     paramName: 'text',
     params: { size: SEARCH_SIZE },
     dataType: 'json',
+    autoSelectFirst: true,
     maxHeight: 500,
     minChars: 2,
     deferRequestBy: 50,

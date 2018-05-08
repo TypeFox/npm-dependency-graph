@@ -12,16 +12,18 @@ import { RectangularNode, moveFeature, SEdge, editFeature, SNodeSchema, SEdgeSch
 export interface DependencyGraphNodeSchema extends SNodeSchema {
     name: string
     versions: string[]
-    description?: string
     resolved?: boolean
+    description?: string
+    url?: string
     error?: string
 }
 
 export class DependencyGraphNode extends RectangularNode {
     name: string = '';
     versions: string[] = [];
-    description?: string;
     resolved: boolean = false;
+    description?: string;
+    url?: string;
     error?: string;
 
     hasFeature(feature: symbol): boolean {

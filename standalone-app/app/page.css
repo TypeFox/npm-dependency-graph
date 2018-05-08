@@ -46,6 +46,10 @@ svg {
     color: #a00;
 }
 
+.sprotty-popup-body.unresolved {
+    font-style: italic;
+}
+
 .popup-info-version {
     margin-left: 12px;
     color: #aaa;

@@ -15,11 +15,13 @@ import { DependencyGraphNodeSchema, DependencyGraphEdgeSchema } from "./graph-mo
 import { PackageMetadata, VersionMetadata } from "./registry-metadata";
 
 export const REGISTRY_URL = 'https://registry.npmjs.org';
+export const WEBSITE_URL = 'https://www.npmjs.com';
 
 @injectable()
 export class NpmDependencyGraphGenerator implements IGraphGenerator {
 
     registryUrl = REGISTRY_URL;
+    websiteUrl = WEBSITE_URL;
 
     readonly graph: SGraphSchema = {
         type: 'graph',
@@ -63,8 +65,11 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
         if (node.resolved) {
             return Promise.resolve(this.graph);
         }
-        const path = `${this.registryUrl}/${node.name.replace(/\//g, '%2F')}`;
+        const nameUrlComponent = encodeURIComponent(node.name);
+        const path = `${this.registryUrl}/${nameUrlComponent}`;
         return this.request(path).then((data: PackageMetadata) => {
+            node.description = data.description;
+            node.url = `${this.websiteUrl}/package/${nameUrlComponent}`;
             const versionData = this.findVersion(node, data);
             if (versionData) {
                 if (versionData.dependencies)
