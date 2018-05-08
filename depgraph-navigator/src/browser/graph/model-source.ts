@@ -79,6 +79,14 @@ export class DepGraphModelSource extends LocalModelSource {
         this.updateModel();
     }
 
+    clear(): void {
+        for (const element of this.model.children!) {
+            this.graphGenerator.index.remove(element);
+        }
+        this.model.children = [];
+        this.updateModel();
+    }
+
     protected handleComputedBounds(action: ComputedBoundsAction): void {
         const root = this.currentRoot;
         const index = this.graphGenerator.index;
