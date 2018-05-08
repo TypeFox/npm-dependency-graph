@@ -12,9 +12,9 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const buildRoot = path.resolve(__dirname, 'lib');
 const appRoot = path.resolve(__dirname, 'app');
-const bootstrapDistPath = 'node_modules/bootstrap/dist';
+const bootstrapDistPath = '../node_modules/bootstrap/dist';
 const jqueryDistPath = '../node_modules/jquery/dist';
-const sprottyCssPath = '../sprotty/client/css';
+const sprottyCssPath = '../node_modules/sprotty/css';
 const elkWorkerPath = '../node_modules/elkjs/lib/elk-worker.min.js';
 
 module.exports = function(env) {
