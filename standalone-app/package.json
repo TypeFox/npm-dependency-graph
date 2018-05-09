@@ -5,6 +5,7 @@
   "version": "0.0.0",
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.7",
+    "@fortawesome/fontawesome-free-brands": "^5.0.12",
     "@fortawesome/fontawesome-free-solid": "^5.0.12",
     "bootstrap": "^4.1.1",
     "depgraph-navigator": "0.0.0",

@@ -11,15 +11,16 @@ import 'reflect-metadata';
 import 'bootstrap';
 import 'devbridge-autocomplete';
 import * as jQuery from 'jquery';
-import * as faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
-import * as faExclamationCircle from '@fortawesome/fontawesome-free-solid/faExclamationCircle'
-import fontawesome from '@fortawesome/fontawesome'
+import * as faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner';
+import * as faExclamationCircle from '@fortawesome/fontawesome-free-solid/faExclamationCircle';
+import * as faGithub from '@fortawesome/fontawesome-free-brands/faGithub';
+import fontawesome from '@fortawesome/fontawesome';
 import { TYPES } from 'sprotty/lib';
 import {
     containerFactory, DepGraphModelSource, REGISTRY_URL, NpmDependencyGraphGenerator, IGraphGenerator
 } from 'depgraph-navigator/lib/browser';
 
-fontawesome.library.add(faSpinner, faExclamationCircle);
+fontawesome.library.add(faSpinner, faExclamationCircle, faGithub);
 
 jQuery(() => {
     const input = jQuery('#package-input');
@@ -51,6 +52,7 @@ jQuery(() => {
         params: { size: SEARCH_SIZE },
         dataType: 'json',
         autoSelectFirst: true,
+        triggerSelectOnValidInput: false,
         preventBadQueries: false,
         maxHeight: 500,
         minChars: 2,
@@ -96,7 +98,7 @@ jQuery(() => {
         errorMessageTimeout = window.setTimeout(() => {
             errorIndicator.attr({ 'data-content': message }).css({ visibility: 'visible' });
             errorVisible = true;
-        }, 500);
+        }, 300);
     }
     const clearErrorMessage = () => {
         if (errorMessageTimeout)
@@ -116,6 +118,9 @@ jQuery(() => {
     // Buttons in the button bar
     jQuery('#button-clear').click(event => {
         modelSource.clear();
+    });
+    jQuery('#button-select-all').click(event => {
+        modelSource.selectAll();
     });
 
     //---------------------------------------------------------

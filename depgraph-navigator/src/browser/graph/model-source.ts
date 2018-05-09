@@ -55,6 +55,11 @@ export class DepGraphModelSource extends LocalModelSource {
         this.actionDispatcher.dispatch(new SelectAction(elementIds));
     }
 
+    selectAll(): void {
+        const elementIds = this.model.children!.filter(c => c.type === 'node').map(c => c.id);
+        this.select(elementIds);
+    }
+
     center(elementIds: string[]): void {
         this.actionDispatcher.dispatch(<FitToScreenAction>{
             elementIds,

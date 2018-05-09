@@ -37,6 +37,15 @@ input {
     border-top: 1px solid #e7e7e7;
 }
 
+.footer-logo {
+    height: 24px;
+    margin: 0px 8px;
+}
+
+.footer-icon {
+    margin: 0px 10px;
+}
+
 svg {
     width: 100%;
     height: 500px;
