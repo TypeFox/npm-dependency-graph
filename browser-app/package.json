@@ -22,9 +22,10 @@
     "@theia/cli": "latest"
   },
   "scripts": {
-    "prepare": "theia build",    
-    "start": "theia start",
-    "watch": "theia build --watch"
+    "prepare": "theia build",
+    "build": "theia build",
+    "watch": "theia build --watch",
+    "start": "theia start"
   },
   "theia": {
     "target": "browser"

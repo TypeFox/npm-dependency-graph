@@ -51,24 +51,6 @@ svg {
     height: 500px;
 }
 
-.sprotty-popup-title {
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.sprotty-popup-body.error {
-    color: #a00;
-}
-
-.sprotty-popup-body.unresolved {
-    font-style: italic;
-}
-
-.popup-info-version {
-    margin-left: 12px;
-    color: #aaa;
-}
-
 .autocomplete-suggestions { 
     border: 1px solid #aaa;
     background: #f0f0f0;

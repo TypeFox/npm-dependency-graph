@@ -24,6 +24,13 @@ export class DepGraphDiagramManager extends DiagramManagerImpl {
     iconClass: string = 'fa fa-arrow-circle-o-up';
     label: string = 'Dependency Graph';
 
+    canHandle(uri: URI, options?: OpenerOptions): number {
+        if (uri.path.name === 'package.json')
+            return 10;
+        else
+            return -1;
+    }
+
     open(uri: URI, input?: OpenerOptions): Promise<DiagramWidget> {
         const promise = super.open(uri, input);
         promise.then(widget => this.createModel(uri, widget.modelSource as DepGraphModelSource));
@@ -35,6 +42,8 @@ export class DepGraphDiagramManager extends DiagramManagerImpl {
             const pck = JSON.parse(content);
             const generator = modelSource.graphGenerator;
             const node = generator.generateNode(pck.name, pck.version);
+            node.description = pck.description;
+            node.resolved = true;
             if (pck.dependencies)
                 generator.addDependencies(node, pck.dependencies);
             if (pck.optionalDependencies)

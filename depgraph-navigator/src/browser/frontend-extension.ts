@@ -13,6 +13,10 @@ import { DiagramConfiguration, DiagramManagerProvider, DiagramManager } from "th
 import { DepGraphDiagramConfiguration } from "./widget/diagram-config";
 import { DepGraphDiagramManager } from "./widget/diagram-manager";
 
+import 'sprotty/css/sprotty.css';
+import 'theia-sprotty/css/theia-sprotty.css';
+import '../../src/browser/style/depgraph.css';
+
 export default new ContainerModule(bind => {
     bind(DiagramConfiguration).to(DepGraphDiagramConfiguration).inSingletonScope();
     bind(DepGraphDiagramManager).toSelf().inSingletonScope();
