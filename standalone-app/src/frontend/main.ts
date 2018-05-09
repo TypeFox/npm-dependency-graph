@@ -34,6 +34,10 @@ jQuery(() => {
         loadingIndicator.css({ visibility: loading ? 'visible' : 'hidden' });
     };
     modelSource.start();
+    const createNode = (name: string) => {
+        modelSource.createNode(name);
+        jQuery('#sprotty>svg').focus();
+    }
 
     // Configure the npm dependency graph generator to use the local proxy
     container.get<NpmDependencyGraphGenerator>(IGraphGenerator).registryUrl = 'registry';
@@ -47,6 +51,7 @@ jQuery(() => {
         params: { size: SEARCH_SIZE },
         dataType: 'json',
         autoSelectFirst: true,
+        preventBadQueries: false,
         maxHeight: 500,
         minChars: 2,
         deferRequestBy: 50,
@@ -71,12 +76,14 @@ jQuery(() => {
                 setErrorMessage(message);
             }
         },
-        onSelect: (suggestion) => {
-            modelSource.createNode(suggestion.value);
-            jQuery('#sprotty>svg').focus();
-        }
+        onSelect: (suggestion) => createNode(suggestion.value)
     });
-    input.keydown(event => clearErrorMessage());
+    input.keyup(event => {
+        clearErrorMessage();
+        // Create a node for the input text even when there are no suggestions
+        if (event.keyCode === 13)
+            createNode(input.val() as string);
+    });
     input.focus();
 
     //---------------------------------------------------------
