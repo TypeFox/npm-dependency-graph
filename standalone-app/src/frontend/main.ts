@@ -15,7 +15,9 @@ import * as faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
 import * as faExclamationCircle from '@fortawesome/fontawesome-free-solid/faExclamationCircle'
 import fontawesome from '@fortawesome/fontawesome'
 import { TYPES } from 'sprotty/lib';
-import { containerFactory, DepGraphModelSource, REGISTRY_URL } from 'depgraph-navigator/lib/browser';
+import {
+    containerFactory, DepGraphModelSource, REGISTRY_URL, NpmDependencyGraphGenerator, IGraphGenerator
+} from 'depgraph-navigator/lib/browser';
 
 fontawesome.library.add(faSpinner, faExclamationCircle);
 
@@ -32,6 +34,9 @@ jQuery(() => {
         loadingIndicator.css({ visibility: loading ? 'visible' : 'hidden' });
     };
     modelSource.start();
+
+    // Configure the npm dependency graph generator to use the local proxy
+    container.get<NpmDependencyGraphGenerator>(IGraphGenerator).registryUrl = 'registry';
 
     //---------------------------------------------------------
     // Set up input field with autocomplete

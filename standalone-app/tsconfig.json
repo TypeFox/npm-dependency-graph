@@ -2,7 +2,10 @@
     "extends": "../base.tsconfig.json",
     "compilerOptions": {
         "rootDir": "src",
-        "outDir": "lib"
+        "outDir": "lib",
+        "types": [
+            "node", "reflect-metadata"
+        ]
     },
     "include": [
         "src"
