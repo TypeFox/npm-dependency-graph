@@ -14,7 +14,8 @@
     "@theia/core": "latest",
     "elkjs": "^0.3.0",
     "semver": "^5.5.0",
-    "sprotty": "0.3.0"
+    "sprotty": "0.3.0",
+    "theia-sprotty": "^0.1.14"
   },
   "devDependencies": {
     "rimraf": "latest",
@@ -28,7 +29,7 @@
   },
   "theiaExtensions": [
     {
-      "frontend": "lib/browser/dependency-graph-frontend-module"
+      "frontend": "lib/browser/frontend-extension"
     }
   ]
 }

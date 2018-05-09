@@ -7,10 +7,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import containerFactory from './graph/graph-sprotty-config';
-export { containerFactory };
+import ElkConstructor from 'elkjs/lib/elk-api';
+import { ElkFactory } from "./graph-layout";
 
-export * from './graph/graph-generator';
-export * from './graph/graph-layout';
-export * from './graph/model-source';
-export * from './graph/npm-dependencies';
+const elkFactory: ElkFactory = () => new ElkConstructor({
+    workerUrl: 'elk/elk-worker.min.js',
+    algorithms: ['layered']
+});
+
+export default elkFactory;

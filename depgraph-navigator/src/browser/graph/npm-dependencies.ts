@@ -117,7 +117,7 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
         return undefined;
     }
 
-    protected addDependencies(node: DependencyGraphNodeSchema, dependencies: { [dep: string]: string }, optional?: boolean): void {
+    addDependencies(node: DependencyGraphNodeSchema, dependencies: { [dep: string]: string }, optional?: boolean): void {
         for (const dep in dependencies) {
             const depNode = this.generateNode(dep, dependencies[dep]);
             const depEdge: DependencyGraphEdgeSchema = {

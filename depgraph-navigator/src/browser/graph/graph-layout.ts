@@ -7,8 +7,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { injectable } from 'inversify';
-import ElkFactory, {
+import { injectable, inject } from 'inversify';
+import {
     ELK, ElkNode, ElkGraphElement, ElkEdge, ElkLabel, ElkShape, ElkPrimitiveEdge, ElkExtendedEdge,
     LayoutOptions
 }from 'elkjs/lib/elk-api';
@@ -17,13 +17,18 @@ import {
     SLabelSchema, Point
 } from 'sprotty/lib';
 
+export type ElkFactory = () => ELK;
+
+export const ElkFactory = Symbol('ElkFactory');
+
 @injectable()
 export class ElkGraphLayout {
 
-    protected readonly elk: ELK = new ElkFactory({
-        workerUrl: 'elk/elk-worker.min.js',
-        algorithms: ['layered']
-    });
+    protected readonly elk: ELK;
+
+    constructor(@inject(ElkFactory) elkFactory: ElkFactory) {
+        this.elk = elkFactory();
+    }
 
     layout(graph: SGraphSchema, index: SModelIndex<SModelElementSchema>): Promise<void> {
         const elkGraph = this.transformToElk(graph) as ElkNode;

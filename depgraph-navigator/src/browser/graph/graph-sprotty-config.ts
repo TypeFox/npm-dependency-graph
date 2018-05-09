@@ -22,11 +22,12 @@ import { NpmDependencyGraphGenerator } from './npm-dependencies';
 import { ResolveNodesHandler } from './resolve-nodes';
 import { DependencyNodeView, DependencyEdgeView } from './graph-views';
 import { popupModelFactory } from './popup-info';
-import { ElkGraphLayout } from './graph-layout';
+import { ElkGraphLayout, ElkFactory } from './graph-layout';
 
-export default () => {
+export default (args: { elkFactory: ElkFactory }) => {
     const depGraphModule = new ContainerModule((bind, unbind, isBound, rebind) => {
         bind(ResolveNodesHandler).toSelf();
+        bind(ElkFactory).toConstantValue(args.elkFactory);
         bind(ElkGraphLayout).toSelf();
         bind(IGraphGenerator).to(NpmDependencyGraphGenerator).inSingletonScope();
         bind(TYPES.ModelSource).to(DepGraphModelSource).inSingletonScope();

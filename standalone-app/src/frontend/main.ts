@@ -19,6 +19,7 @@ import { TYPES } from 'sprotty/lib';
 import {
     containerFactory, DepGraphModelSource, REGISTRY_URL, NpmDependencyGraphGenerator, IGraphGenerator
 } from 'depgraph-navigator/lib/browser';
+import elkFactory from 'depgraph-navigator/lib/browser/graph/elk-webworker';
 
 fontawesome.library.add(faSpinner, faExclamationCircle, faGithub);
 
@@ -29,7 +30,7 @@ jQuery(() => {
 
     //---------------------------------------------------------
     // Create sprotty container and initialize model source
-    const container = containerFactory();
+    const container = containerFactory({ elkFactory });
     const modelSource = container.get<DepGraphModelSource>(TYPES.ModelSource);
     modelSource.loadIndicator = loading => {
         loadingIndicator.css({ visibility: loading ? 'visible' : 'hidden' });
