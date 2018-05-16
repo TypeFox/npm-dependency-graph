@@ -23,8 +23,9 @@
   },
   "scripts": {
     "prepare": "theia build",    
-    "start": "theia start",
-    "watch": "theia build --watch"
+    "build": "theia build --mode development",
+    "watch": "theia build --mode development --watch",
+    "start": "theia start"
   },
   "theia": {
     "target": "electron"

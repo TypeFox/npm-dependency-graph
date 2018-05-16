@@ -9,6 +9,7 @@
 
 import { injectable, inject, Container } from "inversify";
 import { FileSystem } from "@theia/filesystem/lib/common";
+import { StatusBar, StatusBarAlignment } from "@theia/core/lib/browser";
 import { overrideViewerOptions, KeyTool, TYPES } from "sprotty/lib";
 import { DiagramConfiguration, TheiaKeyTool } from "theia-sprotty/lib";
 import { DepGraphModelSource } from "../graph/model-source";
@@ -21,6 +22,7 @@ import elkFactory from '../graph/elk-bundled';
 export class DepGraphDiagramConfiguration implements DiagramConfiguration {
 
     @inject(FileSystem) protected readonly fileSystem!: FileSystem;
+    @inject(StatusBar) protected readonly statusBar!: StatusBar;
 
     readonly diagramType: string = 'dependency-graph';
 
@@ -30,11 +32,25 @@ export class DepGraphDiagramConfiguration implements DiagramConfiguration {
         overrideViewerOptions(container, {
             baseDiv: widgetId
         });
+
         const graphGenerator = container.get<NodeModulesGraphGenerator>(IGraphGenerator);
         graphGenerator.fileSystem = this.fileSystem;
         graphGenerator.registryUrl = 'npm-registry';
+
         const modelSource = container.get<DepGraphModelSource>(TYPES.ModelSource);
+        modelSource.loadIndicator = loading => {
+            if (loading) {
+                this.statusBar.setElement(widgetId + '_loadIndicator', {
+                    text: '$(spinner~spin)',
+                    tooltip: 'Loading package dependencies...',
+                    alignment: StatusBarAlignment.RIGHT
+                });
+            } else {
+                this.statusBar.removeElement(widgetId + '_loadIndicator');
+            }
+        };
         modelSource.start();
+
         return container;
     }
 }
