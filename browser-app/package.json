@@ -23,8 +23,8 @@
   },
   "scripts": {
     "prepare": "theia build",
-    "build": "theia build",
-    "watch": "theia build --watch",
+    "build": "theia build --mode development",
+    "watch": "theia build --mode development --watch",
     "start": "theia start"
   },
   "theia": {

@@ -19,7 +19,7 @@ app.use(express.static('app'))
 // Set up a proxy to the npm registry to avoid CORS
 app.get('/registry/*', (inReq, inRes) => {
     const outReq = http.request({ host: 'registry.npmjs.org', path: getPath(inReq) }, outRes => {
-        inRes.contentType(outRes.headers['content-type'] || 'text/plain');
+        inRes.contentType(outRes.headers['content-type'] || 'application/json');
         inRes.status(outRes.statusCode || 200);
         outRes.on('data', chunk => {
             inRes.write(chunk);

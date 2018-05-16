@@ -38,21 +38,27 @@ export class DepGraphModelSource extends LocalModelSource {
             if (this.loadIndicator) {
                 this.loadIndicator(false);
             }
-            const selection = this.pendingSelection;
-            if (selection.length > 0) {
-                this.select(selection);
-                this.pendingSelection = [];
-            }
-            const center = this.pendingCenter;
-            if (center.length > 0) {
-                this.center(center);
-                this.pendingCenter = [];
-            }
+            window.requestAnimationFrame(() => {
+                const selection = this.pendingSelection;
+                if (selection.length > 0) {
+                    this.select(selection);
+                    this.pendingSelection = [];
+                }
+                const center = this.pendingCenter;
+                if (center.length > 0) {
+                    this.center(center);
+                    this.pendingCenter = [];
+                }
+            });
         };
     }
 
     select(elementIds: string[]): void {
         this.actionDispatcher.dispatch(new SelectAction(elementIds));
+    }
+
+    selectAfterUpdate(elementId: string): void {
+        this.pendingSelection.push(elementId);
     }
 
     selectAll(): void {
@@ -68,6 +74,10 @@ export class DepGraphModelSource extends LocalModelSource {
             maxZoom: 1,
             animate: true
         });
+    }
+
+    centerAfterUpdate(elementId: string): void {
+        this.pendingCenter.push(elementId);
     }
 
     start(): void {

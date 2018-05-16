@@ -71,6 +71,10 @@
     border-color: var(--theia-border-color2);
 }
 
+.sprotty-popup a {
+    color: var(--theia-accent-color0);
+}
+
 .sprotty-popup-title {
     font-weight: bold;
     margin-bottom: 10px;

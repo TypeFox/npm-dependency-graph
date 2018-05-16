@@ -65,13 +65,10 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
         if (node.resolved) {
             return Promise.resolve(this.graph);
         }
-        const nameUrlComponent = node.name.replace(/\//g, '%2F');
-        const path = `${this.registryUrl}/${nameUrlComponent}`;
-        return this.request(path).then((data: PackageMetadata) => {
-            node.description = data.description;
-            node.url = `${this.websiteUrl}/package/${nameUrlComponent}`;
-            const versionData = this.findVersion(node, data);
+        return this.getMetadata(node).then(versionData => {
             if (versionData) {
+                node.description = versionData.description;
+                node.url = `${this.websiteUrl}/package/${node.name}`;
                 if (versionData.dependencies)
                     this.addDependencies(node, versionData.dependencies);
                 if (versionData.optionalDependencies)
@@ -82,6 +79,17 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
             }
             return this.graph;
         });
+    }
+
+    protected async getMetadata(node: DependencyGraphNodeSchema): Promise<VersionMetadata> {
+        const nameUrlComponent = node.name.replace(/\//g, '%2F');
+        const path = `${this.registryUrl}/${nameUrlComponent}`;
+        const data = await this.request(path);
+        const versionData = this.findVersion(node, data);
+        if (versionData)
+            return versionData;
+        else
+            return Promise.reject(new Error(`No matching versions found for ${node.name}: ${node.versions}`));
     }
 
     protected request(url: string): Promise<any> {

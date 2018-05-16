@@ -16,6 +16,7 @@ export interface PackageMetadata {
 
 export interface VersionMetadata {
     name: string
+    description: string
     version: string
     dependencies?: { [dep: string]: string }
     optionalDependencies?: { [dep: string]: string }

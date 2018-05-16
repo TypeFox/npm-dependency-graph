@@ -8,7 +8,7 @@
  */
 
 import { injectable, inject } from 'inversify';
-import { IActionHandler, Action, SelectAction, TYPES } from 'sprotty/lib';
+import { IActionHandler, Action, SelectAction, TYPES, SelectAllCommand, SelectAllAction } from 'sprotty/lib';
 import { DepGraphModelSource } from './model-source';
 import { DependencyGraphNodeSchema } from './graph-model';
 
@@ -18,17 +18,22 @@ export class ResolveNodesHandler implements IActionHandler {
     constructor(@inject(TYPES.ModelSource) protected readonly modelSource: DepGraphModelSource) {}
 
     handle(action: Action): void {
-        if ((action as any).selectedElementsIDs) {
+        const nodes: DependencyGraphNodeSchema[] = [];
+        if ((action as SelectAction).selectedElementsIDs) {
             const select = action as SelectAction;
-            const nodes: DependencyGraphNodeSchema[] = [];
             select.selectedElementsIDs.forEach(id => {
                 const element = this.modelSource.graphGenerator.index.getById(id);
                 if (element && element.type === 'node')
                     nodes.push(element as DependencyGraphNodeSchema);
             });
-            if (nodes.length > 0) {
-                this.modelSource.resolveNodes(nodes);
-            }
+        } else if (action.kind === SelectAllCommand.KIND && (action as SelectAllAction).select) {
+            this.modelSource.graphGenerator.index.all().forEach(element => {
+                if (element.type === 'node')
+                    nodes.push(element as DependencyGraphNodeSchema);
+            });
+        }
+        if (nodes.length > 0) {
+            this.modelSource.resolveNodes(nodes);
         }
     }
 }
