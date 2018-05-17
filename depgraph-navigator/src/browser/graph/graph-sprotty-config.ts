@@ -7,7 +7,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { ContainerModule, Container } from 'inversify';
+import { ContainerModule, Container, interfaces } from 'inversify';
 import {
     TYPES, ConsoleLogger, LogLevel, SGraphFactory, configureModelElement, SGraph,
     SGraphView, HtmlRoot, HtmlRootView, PreRenderedElement, PreRenderedView, SLabel,
@@ -22,21 +22,15 @@ import { NpmDependencyGraphGenerator } from './npm-dependencies';
 import { ResolveNodesHandler } from './resolve-nodes';
 import { DependencyNodeView, DependencyEdgeView } from './graph-views';
 import { popupModelFactory } from './popup-info';
-import { ElkGraphLayout, ElkFactory } from './graph-layout';
+import { ElkGraphLayout } from './graph-layout';
 import { DependencyGraphFilter } from './graph-filter';
 
-export interface ContainerFactoryArguments {
-    elkFactory: ElkFactory
-    graphGenerator?: { new(...args: any[]): IGraphGenerator }
-}
-
-export default (args: ContainerFactoryArguments) => {
+export default (additionalBindings?: interfaces.ContainerModuleCallBack) => {
     const depGraphModule = new ContainerModule((bind, unbind, isBound, rebind) => {
         bind(DependencyGraphFilter).toSelf();
         bind(ResolveNodesHandler).toSelf();
-        bind(ElkFactory).toConstantValue(args.elkFactory);
         bind(ElkGraphLayout).toSelf();
-        bind(IGraphGenerator).to(args.graphGenerator || NpmDependencyGraphGenerator).inSingletonScope();
+        bind(IGraphGenerator).to(NpmDependencyGraphGenerator).inSingletonScope();
         bind(TYPES.ModelSource).to(DepGraphModelSource).inSingletonScope();
         bind(TYPES.PopupModelFactory).toConstantValue(popupModelFactory);
         rebind(TYPES.ILogger).to(ConsoleLogger).inSingletonScope();
@@ -50,6 +44,8 @@ export default (args: ContainerFactoryArguments) => {
         configureModelElement(context, 'compartment', SCompartment, SCompartmentView);
         configureModelElement(context, 'html', HtmlRoot, HtmlRootView);
         configureModelElement(context, 'pre-rendered', PreRenderedElement, PreRenderedView);
+        if (additionalBindings)
+            additionalBindings(bind, unbind, isBound, rebind);
     });
 
     const container = new Container();

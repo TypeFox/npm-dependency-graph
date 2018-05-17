@@ -9,14 +9,11 @@
 
 import { injectable, inject } from "inversify";
 import URI from "@theia/core/lib/common/uri";
-import { Path } from "@theia/core/lib/common";
 import { OpenerOptions } from "@theia/core/lib/browser";
 import { FileSystem } from "@theia/filesystem/lib/common";
 import { DiagramManagerImpl, DiagramWidget } from "theia-sprotty/lib";
 import { DepGraphModelSource } from '../graph/model-source';
-import { DependencyGraphNodeSchema } from "../graph/graph-model";
-import { VersionMetadata } from "../graph/registry-metadata";
-import { NpmDependencyGraphGenerator } from "../graph/npm-dependencies";
+import { NodeModulesGraphGenerator } from "./node-modules";
 
 @injectable()
 export class DepGraphDiagramManager extends DiagramManagerImpl {
@@ -58,33 +55,6 @@ export class DepGraphDiagramManager extends DiagramManagerImpl {
             modelSource.centerAfterUpdate(node.id);
             modelSource.updateModel();
         });
-    }
-
-}
-
-@injectable()
-export class NodeModulesGraphGenerator extends NpmDependencyGraphGenerator {
-
-    fileSystem?: FileSystem;
-    startUri?: URI;
-
-    protected async getMetadata(node: DependencyGraphNodeSchema): Promise<VersionMetadata> {
-        const startUri = this.startUri;
-        if (this.fileSystem && startUri) {
-            const segs = startUri.path.toString().split(Path.separator);
-            while (segs.length > 0 && segs[segs.length - 1] && segs[segs.length - 1] !== '..') {
-                segs.splice(segs.length - 1, 1);
-                const packageUri = startUri.withPath(`${segs.join('/')}/node_modules/${node.name}/package.json`);
-                try {
-                    const { content } = await this.fileSystem.resolveContent(packageUri.toString());
-                    return JSON.parse(content);
-                } catch {
-                    // Try the parent directory
-                }
-            }
-        }
-        // Fall back to the remote package registry
-        return super.getMetadata(node);
     }
 
 }

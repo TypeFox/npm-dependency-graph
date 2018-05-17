@@ -14,7 +14,8 @@ import { overrideViewerOptions, KeyTool, TYPES } from "sprotty/lib";
 import { DiagramConfiguration, TheiaKeyTool } from "theia-sprotty/lib";
 import { DepGraphModelSource } from "../graph/model-source";
 import { IGraphGenerator } from "../graph/graph-generator";
-import { NodeModulesGraphGenerator } from "./diagram-manager";
+import { ElkFactory } from "../graph/graph-layout";
+import { NodeModulesGraphGenerator } from "./node-modules";
 import containerFactory from '../graph/graph-sprotty-config';
 import elkFactory from '../graph/elk-bundled';
 
@@ -27,7 +28,10 @@ export class DepGraphDiagramConfiguration implements DiagramConfiguration {
     readonly diagramType: string = 'dependency-graph';
 
     createContainer(widgetId: string): Container {
-        const container = containerFactory({ elkFactory, graphGenerator: NodeModulesGraphGenerator });
+        const container = containerFactory((bind, unbind, isBound, rebind) => {
+            bind(ElkFactory).toConstantValue(elkFactory);
+            rebind(IGraphGenerator).to(NodeModulesGraphGenerator).inSingletonScope();
+        });
         container.rebind(KeyTool).to(TheiaKeyTool).inSingletonScope();
         overrideViewerOptions(container, {
             baseDiv: widgetId

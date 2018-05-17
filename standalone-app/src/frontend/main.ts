@@ -17,7 +17,8 @@ import * as faGithub from '@fortawesome/fontawesome-free-brands/faGithub';
 import fontawesome from '@fortawesome/fontawesome';
 import { TYPES } from 'sprotty/lib';
 import {
-    containerFactory, DepGraphModelSource, REGISTRY_URL, NpmDependencyGraphGenerator, IGraphGenerator
+    containerFactory, DepGraphModelSource, REGISTRY_URL, NpmDependencyGraphGenerator,
+    IGraphGenerator, ElkFactory
 } from 'depgraph-navigator/lib/browser';
 import elkFactory from 'depgraph-navigator/lib/browser/graph/elk-webworker';
 
@@ -30,7 +31,9 @@ jQuery(() => {
 
     //---------------------------------------------------------
     // Create sprotty container and initialize model source
-    const container = containerFactory({ elkFactory });
+    const container = containerFactory((bind, unbind, isBound, rebind) => {
+        bind(ElkFactory).toConstantValue(elkFactory);
+    });
     const modelSource = container.get<DepGraphModelSource>(TYPES.ModelSource);
     modelSource.loadIndicator = loading => {
         loadingIndicator.css({ visibility: loading ? 'visible' : 'hidden' });
