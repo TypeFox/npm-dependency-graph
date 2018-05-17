@@ -24,7 +24,7 @@ import elkFactory from 'depgraph-navigator/lib/browser/graph/elk-webworker';
 fontawesome.library.add(faSpinner, faExclamationCircle, faGithub);
 
 jQuery(() => {
-    const input = jQuery('#package-input');
+    const packageInput = jQuery('#package-input');
     const loadingIndicator = jQuery('#loading-indicator');
     const errorIndicator = jQuery('#error-indicator');
 
@@ -45,9 +45,9 @@ jQuery(() => {
     container.get<NpmDependencyGraphGenerator>(IGraphGenerator).registryUrl = 'registry';
 
     //---------------------------------------------------------
-    // Set up input field with autocomplete
+    // Set up the package input field with autocomplete
     const SEARCH_SIZE = 12;
-    input.autocomplete({
+    packageInput.autocomplete({
         serviceUrl: REGISTRY_URL + '/-/v1/search',
         paramName: 'text',
         params: { size: SEARCH_SIZE },
@@ -81,13 +81,13 @@ jQuery(() => {
         },
         onSelect: (suggestion) => createNode(suggestion.value)
     });
-    input.keyup(event => {
+    packageInput.keyup(event => {
         clearErrorMessage();
         // Create a node for the input text even when there are no suggestions
         if (event.keyCode === 13)
-            createNode(input.val() as string);
+            createNode(packageInput.val() as string);
     });
-    input.focus();
+    packageInput.focus();
 
     //---------------------------------------------------------
     // Manage the error indicator icon and its popup box
@@ -116,9 +116,22 @@ jQuery(() => {
     });
 
     //---------------------------------------------------------
+    // Set up the dependencies filter
+    const filterInput = jQuery('#filter-input');
+    let filterTimeout: number;
+    filterInput.keyup(event => {
+        if (filterTimeout)
+            window.clearTimeout(filterTimeout);
+        filterTimeout = window.setTimeout(() => {
+            modelSource.filter(filterInput.val() as string);
+        }, 300);
+    });
+
+    //---------------------------------------------------------
     // Buttons in the button bar
     jQuery('#button-clear').click(event => {
         modelSource.clear();
+        filterInput.val('');
     });
     jQuery('#button-select-all').click(event => {
         modelSource.selectAll();
@@ -130,12 +143,12 @@ jQuery(() => {
         const verticalOffset = 3;
         const horizontalOffset = -12;
         loadingIndicator.offset({
-            top: input.offset()!.top + verticalOffset,
-            left: input.offset()!.left + input.width()! + horizontalOffset
+            top: packageInput.offset()!.top + verticalOffset,
+            left: packageInput.offset()!.left + packageInput.width()! + horizontalOffset
         });
         errorIndicator.offset({
-            top: input.offset()!.top + verticalOffset,
-            left: input.offset()!.left + input.width()! + horizontalOffset
+            top: packageInput.offset()!.top + verticalOffset,
+            left: packageInput.offset()!.left + packageInput.width()! + horizontalOffset
         });
     }
     updateIndicatorBounds();

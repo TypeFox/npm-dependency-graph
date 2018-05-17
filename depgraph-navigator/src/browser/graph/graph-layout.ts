@@ -16,6 +16,7 @@ import {
     SGraphSchema, SModelIndex, SModelElementSchema, SNodeSchema, SShapeElementSchema, SEdgeSchema,
     SLabelSchema, Point
 } from 'sprotty/lib';
+import { isNode } from './graph-model';
 
 export type ElkFactory = () => ELK;
 
@@ -31,28 +32,38 @@ export class ElkGraphLayout {
     }
 
     layout(graph: SGraphSchema, index: SModelIndex<SModelElementSchema>): Promise<void> {
-        const elkGraph = this.transformToElk(graph) as ElkNode;
+        const elkGraph = this.transformToElk(graph, index) as ElkNode;
         return this.elk.layout(elkGraph).then(result => this.applyLayout(result, index));
     }
 
-    protected transformToElk(smodel: SModelElementSchema): ElkGraphElement {
+    protected transformToElk(smodel: SModelElementSchema, index: SModelIndex<SModelElementSchema>): ElkGraphElement {
         switch (smodel.type) {
             case 'graph': {
                 const sgraph = smodel as SGraphSchema;
                 return <ElkNode>{
                     id: sgraph.id,
                     layoutOptions: this.graphOptions(sgraph),
-                    children: sgraph.children.filter(c => c.type === 'node').map(c => this.transformToElk(c)) as ElkNode[],
-                    edges: sgraph.children.filter(c => c.type === 'edge').map(c => this.transformToElk(c)) as ElkEdge[]
+                    children: sgraph.children
+                        .filter(c => c.type === 'node' && this.filterNode(c as SNodeSchema))
+                        .map(c => this.transformToElk(c, index)) as ElkNode[],
+                    edges: sgraph.children
+                        .filter(c => c.type === 'edge' && this.filterEdge(c as SEdgeSchema, index))
+                        .map(c => this.transformToElk(c, index)) as ElkEdge[]
                 };
             }
             case 'node': {
                 const snode = smodel as SNodeSchema;
                 const elkNode: ElkNode = { id: snode.id };
                 if (snode.children) {
-                    elkNode.children = snode.children.filter(c => c.type === 'node').map(c => this.transformToElk(c)) as ElkNode[];
-                    elkNode.edges = snode.children.filter(c => c.type === 'edge').map(c => this.transformToElk(c)) as ElkEdge[];
-                    elkNode.labels = snode.children.filter(c => c.type === 'label').map(c => this.transformToElk(c)) as ElkLabel[];
+                    elkNode.children = snode.children
+                        .filter(c => c.type === 'node' && this.filterNode(c as SNodeSchema))
+                        .map(c => this.transformToElk(c, index)) as ElkNode[];
+                    elkNode.edges = snode.children
+                        .filter(c => c.type === 'edge' && this.filterEdge(c as SEdgeSchema, index))
+                        .map(c => this.transformToElk(c, index)) as ElkEdge[];
+                    elkNode.labels = snode.children
+                        .filter(c => c.type === 'label')
+                        .map(c => this.transformToElk(c, index)) as ElkLabel[];
                 }
                 this.transformShape(elkNode, snode);
                 return elkNode;
@@ -65,7 +76,9 @@ export class ElkGraphLayout {
                     target: sedge.targetId
                 };
                 if (sedge.children) {
-                    elkEdge.labels = sedge.children.filter(c => c.type === 'label').map(c => this.transformToElk(c)) as ElkLabel[];
+                    elkEdge.labels = sedge.children
+                        .filter(c => c.type === 'label')
+                        .map(c => this.transformToElk(c, index)) as ElkLabel[];
                 }
                 const points = sedge.routingPoints;
                 if (points && points.length >= 2) {
@@ -84,6 +97,20 @@ export class ElkGraphLayout {
             default:
                 throw new Error('Type not supported: ' + smodel.type);
         }
+    }
+
+    protected filterNode(node: SNodeSchema): boolean {
+        return !(node as any).hidden;
+    }
+
+    protected filterEdge(edge: SEdgeSchema, index: SModelIndex<SModelElementSchema>): boolean {
+        const source = index.getById(edge.sourceId);
+        if (!source || isNode(source) && !this.filterNode(source))
+            return false;
+        const target = index.getById(edge.targetId);
+        if (!target || isNode(target) && !this.filterNode(target))
+            return false;
+        return true;
     }
 
     protected graphOptions(sgraph: SGraphSchema): LayoutOptions {

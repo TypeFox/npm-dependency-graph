@@ -7,21 +7,29 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { RectangularNode, moveFeature, SEdge, editFeature, SNodeSchema, SEdgeSchema } from "sprotty/lib";
+import {
+    RectangularNode, moveFeature, SEdge, editFeature, SNodeSchema, SEdgeSchema, SModelElementSchema
+} from "sprotty/lib";
 
 export interface DependencyGraphNodeSchema extends SNodeSchema {
     name: string
     versions: string[]
     resolved?: boolean
+    hidden?: boolean
     description?: string
     url?: string
     error?: string
+}
+
+export function isNode(element?: SModelElementSchema): element is DependencyGraphNodeSchema {
+    return element !== undefined && element.type === 'node';
 }
 
 export class DependencyGraphNode extends RectangularNode {
     name: string = '';
     versions: string[] = [];
     resolved: boolean = false;
+    hidden: boolean = false;
     description?: string;
     url?: string;
     error?: string;
@@ -36,6 +44,10 @@ export class DependencyGraphNode extends RectangularNode {
 
 export interface DependencyGraphEdgeSchema extends SEdgeSchema {
     optional?: boolean
+}
+
+export function isEdge(element?: SModelElementSchema): element is DependencyGraphEdgeSchema {
+    return element !== undefined && element.type === 'edge';
 }
 
 export class DependencyGraphEdge extends SEdge {

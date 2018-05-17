@@ -23,6 +23,7 @@ import { ResolveNodesHandler } from './resolve-nodes';
 import { DependencyNodeView, DependencyEdgeView } from './graph-views';
 import { popupModelFactory } from './popup-info';
 import { ElkGraphLayout, ElkFactory } from './graph-layout';
+import { DependencyGraphFilter } from './graph-filter';
 
 export interface ContainerFactoryArguments {
     elkFactory: ElkFactory
@@ -31,6 +32,7 @@ export interface ContainerFactoryArguments {
 
 export default (args: ContainerFactoryArguments) => {
     const depGraphModule = new ContainerModule((bind, unbind, isBound, rebind) => {
+        bind(DependencyGraphFilter).toSelf();
         bind(ResolveNodesHandler).toSelf();
         bind(ElkFactory).toConstantValue(args.elkFactory);
         bind(ElkGraphLayout).toSelf();

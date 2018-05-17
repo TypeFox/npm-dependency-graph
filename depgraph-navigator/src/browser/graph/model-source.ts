@@ -10,11 +10,13 @@
 import { injectable, inject, optional } from "inversify";
 import {
     LocalModelSource, ComputedBoundsAction, TYPES, IActionDispatcher, ActionHandlerRegistry, ViewerOptions,
-    PopupModelFactory, IStateAwareModelProvider, SGraphSchema, ILogger, SelectAction, FitToScreenAction
+    PopupModelFactory, IStateAwareModelProvider, SGraphSchema, ILogger, SelectAction, FitToScreenAction,
+    SelectAllAction
 } from "sprotty/lib";
 import { IGraphGenerator } from "./graph-generator";
 import { ElkGraphLayout } from "./graph-layout";
-import { DependencyGraphNodeSchema } from "./graph-model";
+import { DependencyGraphNodeSchema, isNode } from "./graph-model";
+import { DependencyGraphFilter } from "./graph-filter";
 
 @injectable()
 export class DepGraphModelSource extends LocalModelSource {
@@ -28,6 +30,7 @@ export class DepGraphModelSource extends LocalModelSource {
         @inject(TYPES.ActionHandlerRegistry) actionHandlerRegistry: ActionHandlerRegistry,
         @inject(TYPES.ViewerOptions) viewerOptions: ViewerOptions,
         @inject(IGraphGenerator) public readonly graphGenerator: IGraphGenerator,
+        @inject(DependencyGraphFilter) protected readonly graphFilter: DependencyGraphFilter,
         @inject(ElkGraphLayout) protected readonly elk: ElkGraphLayout,
         @inject(TYPES.ILogger) protected readonly logger: ILogger,
         @inject(TYPES.PopupModelFactory)@optional() popupModelFactory?: PopupModelFactory,
@@ -53,8 +56,15 @@ export class DepGraphModelSource extends LocalModelSource {
         };
     }
 
+    start(): void {
+        this.setModel(this.graphGenerator.graph);
+    }
+
     select(elementIds: string[]): void {
-        this.actionDispatcher.dispatch(new SelectAction(elementIds));
+        this.actionDispatcher.dispatch(new SelectAction(elementIds.filter(id => {
+            const element = this.graphGenerator.index.getById(id);
+            return isNode(element) && !element.hidden;
+        })));
     }
 
     selectAfterUpdate(elementId: string): void {
@@ -62,14 +72,17 @@ export class DepGraphModelSource extends LocalModelSource {
     }
 
     selectAll(): void {
-        const elementIds = this.model.children!.filter(c => c.type === 'node').map(c => c.id);
+        const elementIds = this.model.children!.map(c => c.id);
         this.select(elementIds);
     }
 
     center(elementIds: string[]): void {
         this.actionDispatcher.dispatch(<FitToScreenAction>{
-            elementIds,
             kind: 'fit',
+            elementIds: elementIds.filter(id => {
+                const element = this.graphGenerator.index.getById(id);
+                return isNode(element) && !element.hidden;
+            }),
             padding: 20,
             maxZoom: 1,
             animate: true
@@ -80,8 +93,12 @@ export class DepGraphModelSource extends LocalModelSource {
         this.pendingCenter.push(elementId);
     }
 
-    start(): void {
-        this.setModel(this.graphGenerator.graph);
+    filter(text: string): void {
+        this.graphFilter.setFilter(text);
+        this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
+        this.actionDispatcher.dispatch(new SelectAllAction(false));
+        this.pendingCenter = this.model.children!.filter(c => isNode(c) && !c.hidden).map(c => c.id);
+        this.updateModel();
     }
 
     createNode(name: string, version?: string): void {
@@ -94,20 +111,23 @@ export class DepGraphModelSource extends LocalModelSource {
     }
 
     async resolveNodes(nodes: DependencyGraphNodeSchema[]): Promise<void> {
-        if (nodes.every(n => !!n.resolved)) {
+        if (nodes.every(n => !!n.hidden || !!n.resolved)) {
             this.center(nodes.map(n => n.id));
         } else {
             if (this.loadIndicator) {
                 this.loadIndicator(true);
             }
             for (const node of nodes) {
-                try {
-                    await this.graphGenerator.resolveNode(node);
-                } catch (error) {
-                    node.error = error.toString();
+                if (!node.hidden) {
+                    try {
+                        await this.graphGenerator.resolveNode(node);
+                    } catch (error) {
+                        node.error = error.toString();
+                    }
+                    this.pendingCenter.push(node.id);
                 }
-                this.pendingCenter.push(node.id);
             }
+            this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
             this.updateModel();
         }
     }
@@ -117,6 +137,7 @@ export class DepGraphModelSource extends LocalModelSource {
             this.graphGenerator.index.remove(element);
         }
         this.model.children = [];
+        this.graphFilter.setFilter('');
         this.updateModel();
     }
 
