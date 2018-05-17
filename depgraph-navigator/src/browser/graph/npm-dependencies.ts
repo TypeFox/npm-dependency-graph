@@ -61,23 +61,24 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
         };
     }
 
-    resolveNode(node: DependencyGraphNodeSchema): Promise<SGraphSchema> {
+    resolveNode(node: DependencyGraphNodeSchema): Promise<DependencyGraphNodeSchema[]> {
         if (node.resolved) {
-            return Promise.resolve(this.graph);
+            return Promise.resolve([]);
         }
         return this.getMetadata(node).then(versionData => {
+            const result: DependencyGraphNodeSchema[] = [];
             if (versionData) {
                 node.description = versionData.description;
                 node.url = `${this.websiteUrl}/package/${node.name}`;
                 if (versionData.dependencies)
-                    this.addDependencies(node, versionData.dependencies);
+                    result.push(...this.addDependencies(node, versionData.dependencies));
                 if (versionData.optionalDependencies)
-                    this.addDependencies(node, versionData.optionalDependencies, true);
+                    result.push(...this.addDependencies(node, versionData.optionalDependencies, true));
                 if (versionData.peerDependencies)
-                    this.addDependencies(node, versionData.peerDependencies, true);
+                    result.push(...this.addDependencies(node, versionData.peerDependencies, true));
                 node.resolved = true;
             }
-            return this.graph;
+            return result;
         });
     }
 
@@ -125,7 +126,8 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
         return undefined;
     }
 
-    addDependencies(node: DependencyGraphNodeSchema, dependencies: { [dep: string]: string }, optional?: boolean): void {
+    addDependencies(node: DependencyGraphNodeSchema, dependencies: { [dep: string]: string }, optional?: boolean): DependencyGraphNodeSchema[] {
+        const targetNodes: DependencyGraphNodeSchema[] = [];
         for (const dep in dependencies) {
             const depNode = this.generateNode(dep, dependencies[dep]);
             const depEdge: DependencyGraphEdgeSchema = {
@@ -138,8 +140,10 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
             if (!this.index.contains(depEdge)) {
                 this.graph.children.push(depEdge);
                 this.index.add(depEdge);
+                targetNodes.push(depNode);
             }
         }
+        return targetNodes;
     }
 
 }

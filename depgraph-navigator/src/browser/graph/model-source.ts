@@ -71,11 +71,6 @@ export class DepGraphModelSource extends LocalModelSource {
         this.pendingSelection.push(elementId);
     }
 
-    selectAll(): void {
-        const elementIds = this.model.children!.map(c => c.id);
-        this.select(elementIds);
-    }
-
     center(elementIds: string[]): void {
         this.actionDispatcher.dispatch(<FitToScreenAction>{
             kind: 'fit',
@@ -110,29 +105,53 @@ export class DepGraphModelSource extends LocalModelSource {
         }
     }
 
-    resolveNodes(nodes: DependencyGraphNodeSchema[]): void {
+    async resolveNodes(nodes: DependencyGraphNodeSchema[]): Promise<void> {
         if (nodes.every(n => !!n.hidden || !!n.resolved)) {
             this.center(nodes.map(n => n.id));
-        } else {
-            if (this.loadIndicator) {
-                this.loadIndicator(true);
+            return;
+        }
+        if (this.loadIndicator) {
+            this.loadIndicator(true);
+        }
+        const promises: Promise<DependencyGraphNodeSchema[]>[] = [];
+        for (const node of nodes) {
+            if (!node.hidden) {
+                try {
+                    promises.push(this.graphGenerator.resolveNode(node));
+                } catch (error) {
+                    node.error = error.toString();
+                }
+                this.pendingCenter.push(node.id);
             }
-            const promises: Promise<SGraphSchema>[] = [];
+        }
+        await Promise.all(promises)
+        this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
+        this.updateModel();
+    }
+
+    async resolveGraph(): Promise<void> {
+        if (this.loadIndicator) {
+            this.loadIndicator(true);
+        }
+        let nodes = this.model.children!.filter(c => isNode(c) && !c.resolved) as DependencyGraphNodeSchema[];
+        while (nodes.length > 0) {
+            const newNodes: DependencyGraphNodeSchema[] = [];
+            const promises: Promise<void>[] = [];
             for (const node of nodes) {
-                if (!node.hidden) {
-                    try {
-                        promises.push(this.graphGenerator.resolveNode(node));
-                    } catch (error) {
-                        node.error = error.toString();
-                    }
-                    this.pendingCenter.push(node.id);
+                try {
+                    promises.push(this.graphGenerator.resolveNode(node).then(result => {
+                        newNodes.push(...result);
+                    }));
+                } catch (error) {
+                    node.error = error.toString();
                 }
             }
-            Promise.all(promises).then(() => {
-                this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
-                this.updateModel();
-            });
+            await Promise.all(promises);
+            nodes = newNodes;
         }
+        this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
+        this.pendingCenter = this.model.children!.filter(c => isNode(c) && !c.hidden).map(c => c.id);
+        this.updateModel();
     }
 
     clear(): void {

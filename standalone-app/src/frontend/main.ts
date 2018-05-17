@@ -134,15 +134,25 @@ jQuery(() => {
             }
         }, 300);
     });
+    filterInput.popover({
+        trigger: 'hover',
+        placement: 'top'
+    });
 
     //---------------------------------------------------------
     // Buttons in the button bar
     jQuery('#button-clear').click(event => {
         modelSource.clear();
         filterInput.val('');
+    }).popover({
+        trigger: 'hover',
+        placement: 'top'
     });
-    jQuery('#button-select-all').click(event => {
-        modelSource.selectAll();
+    jQuery('#button-resolve-all').click(event => {
+        modelSource.resolveGraph();
+    }).popover({
+        trigger: 'hover',
+        placement: 'top'
     });
 
     //---------------------------------------------------------

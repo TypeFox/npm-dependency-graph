@@ -17,9 +17,9 @@ export interface IGraphGenerator {
 
     generateNode(name: string, version?: string): DependencyGraphNodeSchema;
 
-    resolveNode(node: DependencyGraphNodeSchema): Promise<SGraphSchema>;
+    resolveNode(node: DependencyGraphNodeSchema): Promise<DependencyGraphNodeSchema[]>;
 
-    addDependencies(node: DependencyGraphNodeSchema, dependencies: { [dep: string]: string }, optional?: boolean): void;
+    addDependencies(node: DependencyGraphNodeSchema, dependencies: { [dep: string]: string }, optional?: boolean): DependencyGraphNodeSchema[];
 
 }
 
