@@ -10,9 +10,13 @@
 import { ContainerModule } from "inversify";
 import { CommandContribution, MenuContribution } from '@theia/core/lib/common';
 import { FrontendApplicationContribution, OpenHandler, KeybindingContribution, KeybindingContext } from "@theia/core/lib/browser";
-import { DiagramConfiguration, DiagramManagerProvider, DiagramManager } from "theia-sprotty/lib";
+import { SearchBoxFactory } from "@theia/navigator/lib/browser/search-box";
+import {
+    DiagramConfiguration, DiagramManagerProvider, DiagramManager, DiagramWidgetFactory, DiagramWidget, DiagramWidgetOptions
+} from 'theia-sprotty/lib';
 import { DepGraphDiagramConfiguration } from "./widget/diagram-config";
 import { DepGraphDiagramManager } from "./widget/diagram-manager";
+import { DepGraphWidget } from "./widget/diagram-widget";
 import { DiagramCommandContribution, DepgraphKeybindingContext } from "./widget/diagram-commands";
 
 import 'sprotty/css/sprotty.css';
@@ -25,6 +29,10 @@ export default new ContainerModule(bind => {
     bind(DiagramManagerProvider).toProvider<DiagramManager>(context => {
         return () => Promise.resolve(context.container.get(DepGraphDiagramManager));
     }).whenTargetNamed('dependency-graph');
+    bind(DiagramWidgetFactory).toFactory<DiagramWidget>(context => {
+        const searchBoxFactory = context.container.get<SearchBoxFactory>(SearchBoxFactory);
+        return (options: DiagramWidgetOptions) => new DepGraphWidget(options, searchBoxFactory);
+    });
     bind(FrontendApplicationContribution).toDynamicValue(context => context.container.get(DepGraphDiagramManager));
     bind(OpenHandler).toDynamicValue(context => context.container.get(DepGraphDiagramManager));
     bind(DepgraphKeybindingContext).toSelf().inSingletonScope();

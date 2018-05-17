@@ -11,13 +11,14 @@ import { injectable, inject } from "inversify";
 import URI from "@theia/core/lib/common/uri";
 import { OpenerOptions } from "@theia/core/lib/browser";
 import { FileSystem } from "@theia/filesystem/lib/common";
-import { DiagramManagerImpl, DiagramWidget } from "theia-sprotty/lib";
+import { DiagramManagerImpl, DiagramWidget, DiagramWidgetFactory } from "theia-sprotty/lib";
 import { DepGraphModelSource } from '../graph/model-source';
 import { NodeModulesGraphGenerator } from "./node-modules";
 
 @injectable()
 export class DepGraphDiagramManager extends DiagramManagerImpl {
-
+    
+    @inject(DiagramWidgetFactory) private readonly _diagramWidgetFactory!: DiagramWidgetFactory;
     @inject(FileSystem) protected readonly fileSystem!: FileSystem;
 
     readonly diagramType: string = 'dependency-graph';
@@ -32,10 +33,10 @@ export class DepGraphDiagramManager extends DiagramManagerImpl {
             return 0;
     }
 
-    open(uri: URI, input?: OpenerOptions): Promise<DiagramWidget> {
-        const promise = super.open(uri, input);
-        promise.then(widget => this.createModel(uri, widget.modelSource as DepGraphModelSource));
-        return promise;
+    protected createDiagramWidget(uri: URI): DiagramWidget {
+        const widget = super.createDiagramWidget(uri);
+        this.createModel(uri, widget.modelSource as DepGraphModelSource);
+        return widget;
     }
 
     protected createModel(uri: URI, modelSource: DepGraphModelSource): void {
@@ -55,6 +56,10 @@ export class DepGraphDiagramManager extends DiagramManagerImpl {
             modelSource.centerAfterUpdate(node.id);
             modelSource.updateModel();
         });
+    }
+
+    get diagramWidgetFactory(): DiagramWidgetFactory {
+        return this._diagramWidgetFactory;
     }
 
 }
