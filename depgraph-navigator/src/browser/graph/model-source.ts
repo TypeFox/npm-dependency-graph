@@ -110,25 +110,28 @@ export class DepGraphModelSource extends LocalModelSource {
         }
     }
 
-    async resolveNodes(nodes: DependencyGraphNodeSchema[]): Promise<void> {
+    resolveNodes(nodes: DependencyGraphNodeSchema[]): void {
         if (nodes.every(n => !!n.hidden || !!n.resolved)) {
             this.center(nodes.map(n => n.id));
         } else {
             if (this.loadIndicator) {
                 this.loadIndicator(true);
             }
+            const promises: Promise<SGraphSchema>[] = [];
             for (const node of nodes) {
                 if (!node.hidden) {
                     try {
-                        await this.graphGenerator.resolveNode(node);
+                        promises.push(this.graphGenerator.resolveNode(node));
                     } catch (error) {
                         node.error = error.toString();
                     }
                     this.pendingCenter.push(node.id);
                 }
             }
-            this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
-            this.updateModel();
+            Promise.all(promises).then(() => {
+                this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
+                this.updateModel();
+            });
         }
     }
 

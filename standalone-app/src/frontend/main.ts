@@ -118,12 +118,17 @@ jQuery(() => {
     //---------------------------------------------------------
     // Set up the dependencies filter
     const filterInput = jQuery('#filter-input');
+    let lastFilterValue: string = '';
     let filterTimeout: number;
     filterInput.keyup(event => {
         if (filterTimeout)
             window.clearTimeout(filterTimeout);
         filterTimeout = window.setTimeout(() => {
-            modelSource.filter(filterInput.val() as string);
+            const newValue = filterInput.val() as string;
+            if (newValue !== lastFilterValue) {
+                modelSource.filter(newValue);
+                lastFilterValue = newValue;
+            }
         }, 300);
     });
 
