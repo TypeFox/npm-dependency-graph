@@ -28,11 +28,13 @@ export class NodeModulesGraphGenerator extends NpmDependencyGraphGenerator {
             while (segs.length > 0 && segs[segs.length - 1] && segs[segs.length - 1] !== '..') {
                 segs.splice(segs.length - 1, 1);
                 const packageUri = startUri.withPath(`${segs.join('/')}/node_modules/${node.name}/package.json`);
-                try {
-                    const { content } = await this.fileSystem.resolveContent(packageUri.toString());
-                    return JSON.parse(content);
-                } catch {
-                    // Try the parent directory
+                if (await this.fileSystem.exists(packageUri.toString())) {
+                    try {
+                        const { content } = await this.fileSystem.resolveContent(packageUri.toString());
+                        return JSON.parse(content);
+                    } catch {
+                        // Try the parent directory
+                    }
                 }
             }
         }

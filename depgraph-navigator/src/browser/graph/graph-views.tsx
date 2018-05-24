@@ -9,7 +9,7 @@
 
 import * as snabbdom from 'snabbdom-jsx';
 import { VNode } from "snabbdom/vnode";
-import { IView, RenderingContext, PolylineEdgeView, Point, toDegrees, angleOfPoint } from "sprotty/lib";
+import { IView, RenderingContext, PolylineEdgeView, Point, toDegrees, angleOfPoint, maxDistance } from "sprotty/lib";
 import { DependencyGraphNode, DependencyGraphEdge } from './graph-model';
 
 const JSX = {createElement: snabbdom.svg};
@@ -34,6 +34,9 @@ export class DependencyNodeView implements IView {
 }
 
 export class DependencyEdgeView extends PolylineEdgeView {
+    arrowLength = 10;
+    arrowWidth = 8;
+
     render(edge: Readonly<DependencyGraphEdge>, context: RenderingContext): VNode {
         if ((edge.source as any).hidden || (edge.target as any).hidden) {
             return <g class-depgraph-hidden={true}></g>
@@ -52,10 +55,15 @@ export class DependencyEdgeView extends PolylineEdgeView {
     }
 
     protected renderAdditionals(edge: DependencyGraphEdge, segments: Point[], context: RenderingContext): VNode[] {
-        const p1 = segments[segments.length - 2];
         const p2 = segments[segments.length - 1];
+        let p1: Point;
+        let index = segments.length - 2;
+        do {
+            p1 = segments[index];
+            index--;
+        } while (index >= 0 && maxDistance(p1, p2) < this.arrowLength);
         return [
-            <path class-arrow={true} d="M -1.5,0 L 10,-4 L 10,4 Z"
+            <path class-arrow={true} d={`M -1.5,0 L ${this.arrowLength},-${this.arrowWidth / 2} L ${this.arrowLength},${this.arrowWidth / 2} Z`}
                   transform={`rotate(${toDegrees(angleOfPoint({ x: p1.x - p2.x, y: p1.y - p2.y }))} ${p2.x} ${p2.y}) translate(${p2.x} ${p2.y})`}/>
         ];
     }

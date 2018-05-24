@@ -45,7 +45,7 @@ export class DepGraphDiagramConfiguration implements DiagramConfiguration {
         modelSource.loadIndicator = loading => {
             if (loading) {
                 this.statusBar.setElement(widgetId + '_loadIndicator', {
-                    text: '$(spinner~spin)',
+                    text: 'Loading $(spinner~spin)',
                     tooltip: 'Loading package dependencies...',
                     alignment: StatusBarAlignment.RIGHT
                 });

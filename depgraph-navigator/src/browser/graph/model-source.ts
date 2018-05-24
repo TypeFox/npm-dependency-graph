@@ -20,7 +20,7 @@ import { DependencyGraphFilter } from "./graph-filter";
 @injectable()
 export class DepGraphModelSource extends LocalModelSource {
 
-    loadIndicator?: (loadStatus: boolean) => void;
+    loadIndicator: (loadStatus: boolean) => void = () => {};
 
     constructor(@inject(TYPES.IActionDispatcher) actionDispatcher: IActionDispatcher,
                 @inject(TYPES.ActionHandlerRegistry) actionHandlerRegistry: ActionHandlerRegistry,
@@ -75,11 +75,15 @@ export class DepGraphModelSource extends LocalModelSource {
     }
 
     async filter(text: string): Promise<void> {
+        this.loadIndicator(true);
+
         this.graphFilter.setFilter(text);
         this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
         this.actionDispatcher.dispatch(new SelectAllAction(false));
         const center = this.model.children!.filter(c => isNode(c) && !c.hidden).map(c => c.id);
         await this.updateModel();
+
+        this.loadIndicator(false);
         this.center(center);
     }
 
@@ -87,7 +91,9 @@ export class DepGraphModelSource extends LocalModelSource {
         const isNew = this.graphGenerator.index.getById(name) === undefined;
         const node = this.graphGenerator.generateNode(name, version);
         if (isNew) {
+            this.loadIndicator(true);
             await this.updateModel();
+            this.loadIndicator(false);
             this.select([node.id]);
         }
     }
@@ -97,9 +103,7 @@ export class DepGraphModelSource extends LocalModelSource {
             this.center(nodes.map(n => n.id));
             return;
         }
-        if (this.loadIndicator) {
-            this.loadIndicator(true);
-        }
+        this.loadIndicator(true);
 
         const promises: Promise<DependencyGraphNodeSchema[]>[] = [];
         const center: string[] = [];
@@ -117,16 +121,12 @@ export class DepGraphModelSource extends LocalModelSource {
         this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
         await this.updateModel();
 
-        if (this.loadIndicator) {
-            this.loadIndicator(false);
-        }
+        this.loadIndicator(false);
         this.center(center);
     }
 
     async resolveGraph(): Promise<void> {
-        if (this.loadIndicator) {
-            this.loadIndicator(true);
-        }
+        this.loadIndicator(true);
 
         let nodes = this.model.children!.filter(c => isNode(c) && !c.resolved) as DependencyGraphNodeSchema[];
         while (nodes.length > 0) {
@@ -148,9 +148,7 @@ export class DepGraphModelSource extends LocalModelSource {
         const center = this.model.children!.filter(c => isNode(c) && !c.hidden).map(c => c.id);
         await this.updateModel();
 
-        if (this.loadIndicator) {
-            this.loadIndicator(false);
-        }
+        this.loadIndicator(false);
         this.center(center);
     }
 
