@@ -14,7 +14,7 @@ import {
 }from 'elkjs/lib/elk-api';
 import {
     SGraphSchema, SModelIndex, SModelElementSchema, SNodeSchema, SShapeElementSchema, SEdgeSchema,
-    SLabelSchema, Point
+    SLabelSchema, Point, IModelLayoutEngine
 } from 'sprotty/lib';
 import { isNode } from './graph-model';
 
@@ -23,7 +23,7 @@ export type ElkFactory = () => ELK;
 export const ElkFactory = Symbol('ElkFactory');
 
 @injectable()
-export class ElkGraphLayout {
+export class ElkGraphLayout implements IModelLayoutEngine {
 
     protected readonly elk: ELK;
 
@@ -31,9 +31,16 @@ export class ElkGraphLayout {
         this.elk = elkFactory();
     }
 
-    layout(graph: SGraphSchema, index: SModelIndex<SModelElementSchema>): Promise<void> {
+    layout(graph: SGraphSchema, index?: SModelIndex<SModelElementSchema>): Promise<SGraphSchema> {
+        if (!index) {
+            index = new SModelIndex();
+            index.add(graph);
+        }
         const elkGraph = this.transformToElk(graph, index) as ElkNode;
-        return this.elk.layout(elkGraph).then(result => this.applyLayout(result, index));
+        return this.elk.layout(elkGraph).then(result => {
+            this.applyLayout(result, index!)
+            return graph;
+        });
     }
 
     protected transformToElk(smodel: SModelElementSchema, index: SModelIndex<SModelElementSchema>): ElkGraphElement {

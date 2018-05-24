@@ -5,54 +5,62 @@
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { SModelElementSchema, RequestPopupModelAction, SModelRootSchema, PreRenderedElementSchema } from "sprotty/lib";
+import { injectable } from "inversify";
+import {
+    SModelElementSchema, RequestPopupModelAction, SModelRootSchema, PreRenderedElementSchema, IPopupModelProvider
+} from "sprotty/lib";
 import { DependencyGraphNodeSchema } from "./graph-model";
 
-export function popupModelFactory(request: RequestPopupModelAction, element?: SModelElementSchema): SModelRootSchema | undefined {
-    if (element && element.type === 'node') {
-        const node = element as DependencyGraphNodeSchema;
-        const titleClass = 'sprotty-popup-title';
+@injectable()
+export class PopupModelProvider implements IPopupModelProvider {
 
-        let versions = '';
-        if (node.versions.length > 0)
-            versions = `<span class="popup-info-version">${node.versions.join(', ')}</span>`;
+    getPopupModel(request: RequestPopupModelAction, element?: SModelElementSchema): SModelRootSchema | undefined {
+        if (element && element.type === 'node') {
+            const node = element as DependencyGraphNodeSchema;
+            const titleClass = 'sprotty-popup-title';
 
-        let title: string;
-        if (node.url)
-            title = `<a href="${node.url}">${node.name}</a>${versions}`;
-        else
-            title = `${node.name}${versions}`;
+            let versions = '';
+            if (node.versions.length > 0)
+                versions = `<span class="popup-info-version">${node.versions.join(', ')}</span>`;
 
-        let bodyClass = 'sprotty-popup-body';
-        if (node.error)
-            bodyClass += ' error';
-        else if (!node.resolved)
-            bodyClass += ' unresolved';
+            let title: string;
+            if (node.url)
+                title = `<a href="${node.url}">${node.name}</a>${versions}`;
+            else
+                title = `${node.name}${versions}`;
 
-        let body = '';
-        if (node.error)
-            body = node.error;
-        else if (node.description)
-            body = node.description;
-        else if (!node.resolved)
-            body = 'This package has not been resolved yet. Select it to trigger resolution of package metadata.';
+            let bodyClass = 'sprotty-popup-body';
+            if (node.error)
+                bodyClass += ' error';
+            else if (!node.resolved)
+                bodyClass += ' unresolved';
 
-        return {
-            type: 'html',
-            id: 'popup',
-            children: [
-                <PreRenderedElementSchema> {
-                    type: 'pre-rendered',
-                    id: 'popup-title',
-                    code: `<div class="${titleClass}">${title}</div>`
-                },
-                <PreRenderedElementSchema> {
-                    type: 'pre-rendered',
-                    id: 'popup-body',
-                    code: `<div class="${bodyClass}">${body}</div>`
-                }
-            ]
-        };
+            let body = '';
+            if (node.error)
+                body = node.error;
+            else if (node.description)
+                body = node.description;
+            else if (!node.resolved)
+                body = 'This package has not been resolved yet. Select it to trigger resolution of package metadata.';
+
+            return {
+                type: 'html',
+                id: 'popup',
+                children: [
+                    <PreRenderedElementSchema> {
+                        type: 'pre-rendered',
+                        id: 'popup-title',
+                        code: `<div class="${titleClass}">${title}</div>`
+                    },
+                    <PreRenderedElementSchema> {
+                        type: 'pre-rendered',
+                        id: 'popup-body',
+                        code: `<div class="${bodyClass}">${body}</div>`
+                    }
+                ]
+            };
+        }
+        return undefined;
     }
-    return undefined;
+
 }

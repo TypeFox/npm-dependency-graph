@@ -9,12 +9,11 @@
 
 import { injectable, inject, optional } from "inversify";
 import {
-    LocalModelSource, ComputedBoundsAction, TYPES, IActionDispatcher, ActionHandlerRegistry, ViewerOptions,
-    PopupModelFactory, IStateAwareModelProvider, SGraphSchema, ILogger, SelectAction, FitToScreenAction,
-    SelectAllAction, Action, SelectCommand, SelectAllCommand
+    LocalModelSource, TYPES, IActionDispatcher, ActionHandlerRegistry, ViewerOptions,
+    IPopupModelProvider, IStateAwareModelProvider, ILogger, SelectAction, FitToScreenAction,
+    SelectAllAction, Action, SelectCommand, SelectAllCommand, IModelLayoutEngine
 } from "sprotty/lib";
 import { IGraphGenerator } from "./graph-generator";
-import { ElkGraphLayout } from "./graph-layout";
 import { DependencyGraphNodeSchema, isNode } from "./graph-model";
 import { DependencyGraphFilter } from "./graph-filter";
 
@@ -24,16 +23,16 @@ export class DepGraphModelSource extends LocalModelSource {
     loadIndicator?: (loadStatus: boolean) => void;
 
     constructor(@inject(TYPES.IActionDispatcher) actionDispatcher: IActionDispatcher,
-        @inject(TYPES.ActionHandlerRegistry) actionHandlerRegistry: ActionHandlerRegistry,
-        @inject(TYPES.ViewerOptions) viewerOptions: ViewerOptions,
-        @inject(IGraphGenerator) public readonly graphGenerator: IGraphGenerator,
-        @inject(DependencyGraphFilter) protected readonly graphFilter: DependencyGraphFilter,
-        @inject(ElkGraphLayout) protected readonly elk: ElkGraphLayout,
-        @inject(TYPES.ILogger) protected readonly logger: ILogger,
-        @inject(TYPES.PopupModelFactory)@optional() popupModelFactory?: PopupModelFactory,
-        @inject(TYPES.StateAwareModelProvider)@optional() modelProvider?: IStateAwareModelProvider
-    ) {
-        super(actionDispatcher, actionHandlerRegistry, viewerOptions, popupModelFactory, modelProvider);
+                @inject(TYPES.ActionHandlerRegistry) actionHandlerRegistry: ActionHandlerRegistry,
+                @inject(TYPES.ViewerOptions) viewerOptions: ViewerOptions,
+                @inject(TYPES.ILogger) logger: ILogger,
+                @inject(IGraphGenerator) public readonly graphGenerator: IGraphGenerator,
+                @inject(DependencyGraphFilter) protected readonly graphFilter: DependencyGraphFilter,
+                @inject(TYPES.StateAwareModelProvider)@optional() modelProvider?: IStateAwareModelProvider,
+                @inject(TYPES.IPopupModelProvider)@optional() popupModelProvider?: IPopupModelProvider,
+                @inject(TYPES.IModelLayoutEngine)@optional() layoutEngine?: IModelLayoutEngine
+            ) {
+        super(actionDispatcher, actionHandlerRegistry, viewerOptions, logger, modelProvider, popupModelProvider, layoutEngine);
     }
 
     protected initialize(registry: ActionHandlerRegistry): void {
@@ -200,31 +199,6 @@ export class DepGraphModelSource extends LocalModelSource {
                 this.resolveNodes(nodes);
             }
         }
-    }
-
-    protected handleComputedBounds(action: ComputedBoundsAction): void {
-        const root = this.currentRoot;
-        const index = this.graphGenerator.index;
-        for (const b of action.bounds) {
-            const element = index.getById(b.elementId);
-            if (element !== undefined)
-                this.applyBounds(element, b.newBounds);
-        }
-        if (action.alignments !== undefined) {
-            for (const a of action.alignments) {
-                const element = index.getById(a.elementId);
-                if (element !== undefined)
-                    this.applyAlignment(element, a.newAlignment);
-            }
-        }
-
-        // Compute a layout with elkjs
-        this.elk.layout(root as SGraphSchema, index).then(() => {
-            this.doSubmitModel(root, true);
-        }).catch(error => {
-            this.logger.error(this, error.toString());
-            this.doSubmitModel(root, true);
-        });
     }
 
 }

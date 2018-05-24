@@ -19,17 +19,17 @@ import { IGraphGenerator } from './graph-generator';
 import { DepGraphModelSource } from './model-source';
 import { NpmDependencyGraphGenerator } from './npm-dependencies';
 import { DependencyNodeView, DependencyEdgeView } from './graph-views';
-import { popupModelFactory } from './popup-info';
+import { PopupModelProvider } from './popup-info';
 import { ElkGraphLayout } from './graph-layout';
 import { DependencyGraphFilter } from './graph-filter';
 
 export default (additionalBindings?: interfaces.ContainerModuleCallBack) => {
     const depGraphModule = new ContainerModule((bind, unbind, isBound, rebind) => {
         bind(DependencyGraphFilter).toSelf();
-        bind(ElkGraphLayout).toSelf();
         bind(IGraphGenerator).to(NpmDependencyGraphGenerator).inSingletonScope();
         bind(TYPES.ModelSource).to(DepGraphModelSource).inSingletonScope();
-        bind(TYPES.PopupModelFactory).toConstantValue(popupModelFactory);
+        bind(TYPES.IModelLayoutEngine).to(ElkGraphLayout);
+        bind(TYPES.IPopupModelProvider).to(PopupModelProvider);
         rebind(TYPES.ILogger).to(ConsoleLogger).inSingletonScope();
         rebind(TYPES.LogLevel).toConstantValue(LogLevel.warn);
         rebind(TYPES.IModelFactory).to(SGraphFactory).inSingletonScope();
