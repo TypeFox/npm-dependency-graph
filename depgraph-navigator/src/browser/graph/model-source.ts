@@ -11,7 +11,7 @@ import { injectable, inject, optional } from "inversify";
 import {
     LocalModelSource, ComputedBoundsAction, TYPES, IActionDispatcher, ActionHandlerRegistry, ViewerOptions,
     PopupModelFactory, IStateAwareModelProvider, SGraphSchema, ILogger, SelectAction, FitToScreenAction,
-    SelectAllAction
+    SelectAllAction, Action, SelectCommand, SelectAllCommand
 } from "sprotty/lib";
 import { IGraphGenerator } from "./graph-generator";
 import { ElkGraphLayout } from "./graph-layout";
@@ -20,9 +20,6 @@ import { DependencyGraphFilter } from "./graph-filter";
 
 @injectable()
 export class DepGraphModelSource extends LocalModelSource {
-
-    private pendingSelection: string[] = [];
-    private pendingCenter: string[] = [];
 
     loadIndicator?: (loadStatus: boolean) => void;
 
@@ -37,71 +34,62 @@ export class DepGraphModelSource extends LocalModelSource {
         @inject(TYPES.StateAwareModelProvider)@optional() modelProvider?: IStateAwareModelProvider
     ) {
         super(actionDispatcher, actionHandlerRegistry, viewerOptions, popupModelFactory, modelProvider);
-        this.onModelSubmitted = (newRoot) => {
-            if (this.loadIndicator) {
-                this.loadIndicator(false);
-            }
-            window.requestAnimationFrame(() => {
-                const selection = this.pendingSelection;
-                if (selection.length > 0) {
-                    this.select(selection);
-                    this.pendingSelection = [];
-                }
-                const center = this.pendingCenter;
-                if (center.length > 0) {
-                    this.center(center);
-                    this.pendingCenter = [];
-                }
-            });
-        };
     }
 
-    start(): void {
-        this.setModel(this.graphGenerator.graph);
+    protected initialize(registry: ActionHandlerRegistry): void {
+        super.initialize(registry);
+
+        registry.register(SelectCommand.KIND, this);
+        registry.register(SelectAllCommand.KIND, this);
     }
 
-    select(elementIds: string[]): void {
-        this.actionDispatcher.dispatch(new SelectAction(elementIds.filter(id => {
-            const element = this.graphGenerator.index.getById(id);
-            return isNode(element) && !element.hidden;
-        })));
+    start(): Promise<void> {
+        return this.setModel(this.graphGenerator.graph);
     }
 
-    selectAfterUpdate(elementId: string): void {
-        this.pendingSelection.push(elementId);
-    }
-
-    center(elementIds: string[]): void {
-        this.actionDispatcher.dispatch(<FitToScreenAction>{
-            kind: 'fit',
-            elementIds: elementIds.filter(id => {
+    select(elementIds: string[]): Promise<void> {
+        if (elementIds.length > 0) {
+            return this.actionDispatcher.dispatch(new SelectAction(elementIds.filter(id => {
                 const element = this.graphGenerator.index.getById(id);
                 return isNode(element) && !element.hidden;
-            }),
-            padding: 20,
-            maxZoom: 1,
-            animate: true
-        });
+            })));
+        } else {
+            return Promise.resolve();
+        }
     }
 
-    centerAfterUpdate(elementId: string): void {
-        this.pendingCenter.push(elementId);
+    center(elementIds: string[]): Promise<void> {
+        if (elementIds.length > 0) {
+            return this.actionDispatcher.dispatch(<FitToScreenAction>{
+                kind: 'fit',
+                elementIds: elementIds.filter(id => {
+                    const element = this.graphGenerator.index.getById(id);
+                    return isNode(element) && !element.hidden;
+                }),
+                padding: 20,
+                maxZoom: 1,
+                animate: true
+            });
+        } else {
+            return Promise.resolve();
+        }
     }
 
-    filter(text: string): void {
+    async filter(text: string): Promise<void> {
         this.graphFilter.setFilter(text);
         this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
         this.actionDispatcher.dispatch(new SelectAllAction(false));
-        this.pendingCenter = this.model.children!.filter(c => isNode(c) && !c.hidden).map(c => c.id);
-        this.updateModel();
+        const center = this.model.children!.filter(c => isNode(c) && !c.hidden).map(c => c.id);
+        await this.updateModel();
+        this.center(center);
     }
 
-    createNode(name: string, version?: string): void {
+    async createNode(name: string, version?: string): Promise<void> {
         const isNew = this.graphGenerator.index.getById(name) === undefined;
         const node = this.graphGenerator.generateNode(name, version);
         if (isNew) {
-            this.pendingSelection.push(node.id);
-            this.updateModel();
+            await this.updateModel();
+            this.select([node.id]);
         }
     }
 
@@ -113,7 +101,9 @@ export class DepGraphModelSource extends LocalModelSource {
         if (this.loadIndicator) {
             this.loadIndicator(true);
         }
+
         const promises: Promise<DependencyGraphNodeSchema[]>[] = [];
+        const center: string[] = [];
         for (const node of nodes) {
             if (!node.hidden) {
                 try {
@@ -121,18 +111,24 @@ export class DepGraphModelSource extends LocalModelSource {
                 } catch (error) {
                     node.error = error.toString();
                 }
-                this.pendingCenter.push(node.id);
+                center.push(node.id);
             }
         }
         await Promise.all(promises)
         this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
-        this.updateModel();
+        await this.updateModel();
+
+        if (this.loadIndicator) {
+            this.loadIndicator(false);
+        }
+        this.center(center);
     }
 
     async resolveGraph(): Promise<void> {
         if (this.loadIndicator) {
             this.loadIndicator(true);
         }
+
         let nodes = this.model.children!.filter(c => isNode(c) && !c.resolved) as DependencyGraphNodeSchema[];
         while (nodes.length > 0) {
             const newNodes: DependencyGraphNodeSchema[] = [];
@@ -150,17 +146,60 @@ export class DepGraphModelSource extends LocalModelSource {
             nodes = newNodes;
         }
         this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
-        this.pendingCenter = this.model.children!.filter(c => isNode(c) && !c.hidden).map(c => c.id);
-        this.updateModel();
+        const center = this.model.children!.filter(c => isNode(c) && !c.hidden).map(c => c.id);
+        await this.updateModel();
+
+        if (this.loadIndicator) {
+            this.loadIndicator(false);
+        }
+        this.center(center);
     }
 
-    clear(): void {
+    clear(): Promise<void> {
         for (const element of this.model.children!) {
             this.graphGenerator.index.remove(element);
         }
         this.model.children = [];
         this.graphFilter.setFilter('');
-        this.updateModel();
+        return this.updateModel();
+    }
+
+    handle(action: Action): void {
+        switch (action.kind) {
+            case SelectCommand.KIND:
+                this.handleSelect(action as SelectAction);
+                break;
+            case SelectAllCommand.KIND:
+                this.handleSelectAll(action as SelectAllAction);
+                break;
+            default:
+                super.handle(action);
+        }
+    }
+
+    protected handleSelect(action: SelectAction) {
+        const nodes: DependencyGraphNodeSchema[] = [];
+        action.selectedElementsIDs.forEach(id => {
+            const element = this.graphGenerator.index.getById(id);
+            if (element && element.type === 'node')
+                nodes.push(element as DependencyGraphNodeSchema);
+        });
+        if (nodes.length > 0) {
+            this.resolveNodes(nodes);
+        }
+    }
+
+    protected handleSelectAll(action: SelectAllAction) {
+        if (action.select) {
+            const nodes: DependencyGraphNodeSchema[] = [];
+            this.graphGenerator.index.all().forEach(element => {
+                if (element.type === 'node')
+                    nodes.push(element as DependencyGraphNodeSchema);
+            });
+            if (nodes.length > 0) {
+                this.resolveNodes(nodes);
+            }
+        }
     }
 
     protected handleComputedBounds(action: ComputedBoundsAction): void {

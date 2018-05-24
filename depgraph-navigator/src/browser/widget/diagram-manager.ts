@@ -53,8 +53,9 @@ export class DepGraphDiagramManager extends DiagramManagerImpl {
                 generator.addDependencies(node, pck.optionalDependencies, true);
             if (pck.peerDependencies)
                 generator.addDependencies(node, pck.peerDependencies, true);
-            modelSource.centerAfterUpdate(node.id);
-            modelSource.updateModel();
+            modelSource.updateModel().then(() => {
+                modelSource.center([node.id]);
+            });
         });
     }
 

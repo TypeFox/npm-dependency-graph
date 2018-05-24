@@ -29,6 +29,7 @@ h2 {
 
 .button-bar input {
     display: inline;
+    vertical-align: middle;
     width: auto;
 }
 

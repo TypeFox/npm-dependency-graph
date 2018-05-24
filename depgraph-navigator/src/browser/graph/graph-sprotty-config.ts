@@ -11,15 +11,13 @@ import { ContainerModule, Container, interfaces } from 'inversify';
 import {
     TYPES, ConsoleLogger, LogLevel, SGraphFactory, configureModelElement, SGraph,
     SGraphView, HtmlRoot, HtmlRootView, PreRenderedElement, PreRenderedView, SLabel,
-    SLabelView, SCompartment, SCompartmentView, defaultModule, selectModule,
-    moveModule, boundsModule, fadeModule, viewportModule, exportModule, hoverModule,
-    ActionHandlerRegistry, SelectCommand, edgeEditModule, SelectAllCommand
+    SLabelView, SCompartment, SCompartmentView, defaultModule, selectModule, moveModule,
+    boundsModule, fadeModule, viewportModule, exportModule, hoverModule, edgeEditModule
 } from 'sprotty/lib';
 import { DependencyGraphNode, DependencyGraphEdge } from './graph-model';
 import { IGraphGenerator } from './graph-generator';
 import { DepGraphModelSource } from './model-source';
 import { NpmDependencyGraphGenerator } from './npm-dependencies';
-import { ResolveNodesHandler } from './resolve-nodes';
 import { DependencyNodeView, DependencyEdgeView } from './graph-views';
 import { popupModelFactory } from './popup-info';
 import { ElkGraphLayout } from './graph-layout';
@@ -28,7 +26,6 @@ import { DependencyGraphFilter } from './graph-filter';
 export default (additionalBindings?: interfaces.ContainerModuleCallBack) => {
     const depGraphModule = new ContainerModule((bind, unbind, isBound, rebind) => {
         bind(DependencyGraphFilter).toSelf();
-        bind(ResolveNodesHandler).toSelf();
         bind(ElkGraphLayout).toSelf();
         bind(IGraphGenerator).to(NpmDependencyGraphGenerator).inSingletonScope();
         bind(TYPES.ModelSource).to(DepGraphModelSource).inSingletonScope();
@@ -51,10 +48,5 @@ export default (additionalBindings?: interfaces.ContainerModuleCallBack) => {
     const container = new Container();
     container.load(defaultModule, selectModule, moveModule, boundsModule, fadeModule, viewportModule,
         exportModule, hoverModule, edgeEditModule, depGraphModule);
-    
-    const actionHandlerRegistry = container.get<ActionHandlerRegistry>(TYPES.ActionHandlerRegistry);
-    const resolveNodesHandler = container.get(ResolveNodesHandler);
-    actionHandlerRegistry.register(SelectCommand.KIND, resolveNodesHandler);
-    actionHandlerRegistry.register(SelectAllCommand.KIND, resolveNodesHandler);
     return container;
 };
