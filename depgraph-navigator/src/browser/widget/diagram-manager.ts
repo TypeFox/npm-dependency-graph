@@ -39,28 +39,44 @@ export class DepGraphDiagramManager extends DiagramManagerImpl {
         return widget;
     }
 
-    protected createModel(uri: URI, modelSource: DepGraphModelSource): void {
-        this.fileSystem.resolveContent(uri.toString()).then(({stat, content}) => {
-            const pck = JSON.parse(content);
-            const generator = modelSource.graphGenerator as NodeModulesGraphGenerator;
-            generator.startUri = uri;
-            const node = generator.generateNode(pck.name, pck.version);
-            node.description = pck.description;
-            node.resolved = true;
-            if (pck.dependencies)
-                generator.addDependencies(node, pck.dependencies);
-            if (pck.optionalDependencies)
-                generator.addDependencies(node, pck.optionalDependencies, true);
-            if (pck.peerDependencies)
-                generator.addDependencies(node, pck.peerDependencies, true);
-            modelSource.updateModel().then(() => {
-                modelSource.center([node.id]);
-            });
-        });
+    protected async createModel(uri: URI, modelSource: DepGraphModelSource): Promise<void> {
+        // Workaround for https://github.com/theia-ide/sprotty/issues/218
+        await animationFrames(3);
+
+        const { content } = await this.fileSystem.resolveContent(uri.toString());
+        const pck = JSON.parse(content);
+        const generator = modelSource.graphGenerator as NodeModulesGraphGenerator;
+        generator.startUri = uri;
+        const node = generator.generateNode(pck.name, pck.version);
+        node.description = pck.description;
+        node.resolved = true;
+        if (pck.dependencies)
+            generator.addDependencies(node, pck.dependencies);
+        if (pck.optionalDependencies)
+            generator.addDependencies(node, pck.optionalDependencies, true);
+        if (pck.peerDependencies)
+            generator.addDependencies(node, pck.peerDependencies, true);
+        await modelSource.updateModel();
+        modelSource.center([node.id]);
     }
 
     get diagramWidgetFactory(): DiagramWidgetFactory {
         return this._diagramWidgetFactory;
     }
 
+}
+
+function animationFrames(number: number): Promise<void> {
+    if (number < 0) {
+        throw new Error('Illegal argument: ' + number);
+    }
+    return new Promise(resolve => {
+        function recurse(n: number): void {
+            if (n === 0)
+                resolve();
+            else
+                window.requestAnimationFrame(() => recurse(n - 1));
+        }
+        recurse(number);
+    });
 }

@@ -31,7 +31,10 @@ export class ElkGraphLayout implements IModelLayoutEngine {
         this.elk = elkFactory();
     }
 
-    layout(graph: SGraphSchema, index?: SModelIndex<SModelElementSchema>): Promise<SGraphSchema> {
+    layout(graph: SGraphSchema, index?: SModelIndex<SModelElementSchema>): SGraphSchema | Promise<SGraphSchema> {
+        if (graph.type !== 'graph') {
+            return graph;
+        }
         if (!index) {
             index = new SModelIndex();
             index.add(graph);

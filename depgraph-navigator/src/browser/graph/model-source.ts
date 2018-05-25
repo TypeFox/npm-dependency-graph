@@ -42,8 +42,8 @@ export class DepGraphModelSource extends LocalModelSource {
         registry.register(SelectAllCommand.KIND, this);
     }
 
-    start(): Promise<void> {
-        return this.setModel(this.graphGenerator.graph);
+    start(): void {
+        this.currentRoot = this.graphGenerator.graph;
     }
 
     select(elementIds: string[]): Promise<void> {
