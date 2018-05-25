@@ -53,7 +53,6 @@ export class DepGraphDiagramConfiguration implements DiagramConfiguration {
                 this.statusBar.removeElement(widgetId + '_loadIndicator');
             }
         };
-        modelSource.start();
 
         return container;
     }

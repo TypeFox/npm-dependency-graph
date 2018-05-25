@@ -110,7 +110,7 @@ export class ElkGraphLayout implements IModelLayoutEngine {
     }
 
     protected filterNode(node: SNodeSchema): boolean {
-        return !(node as any).hidden;
+        return true;
     }
 
     protected filterEdge(edge: SEdgeSchema, index: SModelIndex<SModelElementSchema>): boolean {

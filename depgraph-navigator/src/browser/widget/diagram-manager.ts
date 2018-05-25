@@ -41,7 +41,7 @@ export class DepGraphDiagramManager extends DiagramManagerImpl {
 
     protected async createModel(uri: URI, modelSource: DepGraphModelSource): Promise<void> {
         // Workaround for https://github.com/theia-ide/sprotty/issues/218
-        await animationFrames(3);
+        await animationFrames(4);
 
         const { content } = await this.fileSystem.resolveContent(uri.toString());
         const pck = JSON.parse(content);

@@ -18,10 +18,6 @@ export class DependencyNodeView implements IView {
     cornerRadius = 5;
 
     render(node: Readonly<DependencyGraphNode>, context: RenderingContext): VNode {
-        if (node.hidden) {
-            return <g class-depgraph-hidden={true}></g>
-        }
-
         return <g>
             <rect class-sprotty-node={true}
                   class-mouseover={node.hoverFeedback} class-selected={node.selected}
@@ -38,10 +34,6 @@ export class DependencyEdgeView extends PolylineEdgeView {
     arrowWidth = 8;
 
     render(edge: Readonly<DependencyGraphEdge>, context: RenderingContext): VNode {
-        if ((edge.source as any).hidden || (edge.target as any).hidden) {
-            return <g class-depgraph-hidden={true}></g>
-        }
-
         const route = edge.route();
         if (route.length === 0)
             return this.renderDanglingEdge("Cannot compute route", edge, context);

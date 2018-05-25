@@ -38,7 +38,6 @@ jQuery(() => {
     modelSource.loadIndicator = loading => {
         loadingIndicator.css({ visibility: loading ? 'visible' : 'hidden' });
     };
-    modelSource.start();
     const createNode = (name: string) => {
         modelSource.createNode(name);
         jQuery('#sprotty>svg').focus();

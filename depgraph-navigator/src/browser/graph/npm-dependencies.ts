@@ -9,7 +9,7 @@
 
 import { injectable } from "inversify";
 import { maxSatisfying } from "semver";
-import { SGraphSchema, SModelIndex, SModelElementSchema, SLabelSchema } from "sprotty/lib";
+import { SModelIndex, SModelElementSchema, SLabelSchema } from "sprotty/lib";
 import { IGraphGenerator } from "./graph-generator";
 import { DependencyGraphNodeSchema, DependencyGraphEdgeSchema } from "./graph-model";
 import { PackageMetadata, VersionMetadata } from "./registry-metadata";
@@ -23,19 +23,15 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
     registryUrl = REGISTRY_URL;
     websiteUrl = WEBSITE_URL;
 
-    readonly graph: SGraphSchema = {
-        type: 'graph',
-        id: 'npm-dependency-graph',
-        children: []
-    };
-
+    readonly nodes: DependencyGraphNodeSchema[] = [];
+    readonly edges: DependencyGraphEdgeSchema[] = [];
     readonly index = new SModelIndex<SModelElementSchema>();
 
     generateNode(name: string, version?: string): DependencyGraphNodeSchema {
         let node = this.index.getById(name) as DependencyGraphNodeSchema;
         if (node === undefined) {
             node = this.createNode(name);
-            this.graph.children.push(node);
+            this.nodes.push(node);
             this.index.add(node);
         }
         if (version && node.versions.indexOf(version) < 0) {
@@ -138,7 +134,7 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
                 targetId: depNode.id
             };
             if (!this.index.contains(depEdge)) {
-                this.graph.children.push(depEdge);
+                this.edges.push(depEdge);
                 this.index.add(depEdge);
                 targetNodes.push(depNode);
             }

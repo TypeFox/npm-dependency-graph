@@ -8,8 +8,9 @@
  */
 
 import { injectable } from "inversify";
-import { SGraphSchema, SModelIndex, SModelElementSchema } from "sprotty/lib";
-import { DependencyGraphNodeSchema, DependencyGraphEdgeSchema, isNode, isEdge } from "./graph-model";
+import { SModelIndex, SModelElementSchema } from "sprotty/lib";
+import { DependencyGraphNodeSchema, DependencyGraphEdgeSchema, isNode } from "./graph-model";
+import { IGraphGenerator } from "./graph-generator";
 
 @injectable()
 export class DependencyGraphFilter {
@@ -30,49 +31,45 @@ export class DependencyGraphFilter {
             this.nameFilter = name => name.indexOf(textTrim) >= 0;
     }
 
-    refresh(graph: SGraphSchema, index: SModelIndex<SModelElementSchema>): void {
+    refresh(generator: IGraphGenerator): void {
         let nodeCount = 0;
         let visibleCount = 0;
 
         // Count the nodes and apply the name filter
-        for (const element of graph.children) {
-            if (isNode(element)) {
-                const visible = this.nameFilter(element.name);
-                element.hidden = !visible;
-                nodeCount++;
-                if (visible)
-                    visibleCount++;
-            }
+        for (const node of generator.nodes) {
+            const visible = this.nameFilter(node.name);
+            node.hidden = !visible;
+            nodeCount++;
+            if (visible)
+                visibleCount++;
         }
         if (visibleCount === nodeCount)
             return;
         
         // Construct a map of incoming edges
-        const incoming = this.createIncomingMap(graph, index);
+        const incoming = this.createIncomingMap(generator.edges, generator.index);
         const dfsMark: { [id: string]: boolean } = {};
 
         // Perform a depth-first-search to find the nodes from which the name-filtered nodes are reachable
-        for (const element of graph.children) {
-            if (isNode(element) && !element.hidden) {
-                this.dfs(element, incoming, dfsMark, index);
+        for (const node of generator.nodes) {
+            if (!node.hidden) {
+                this.dfs(node, incoming, dfsMark, generator.index);
             }
         }
     }
 
-    protected createIncomingMap(graph: SGraphSchema, index: SModelIndex<SModelElementSchema>):
+    protected createIncomingMap(edges: DependencyGraphEdgeSchema[], index: SModelIndex<SModelElementSchema>):
             Map<DependencyGraphNodeSchema, DependencyGraphEdgeSchema[]> {
         const incoming = new Map<DependencyGraphNodeSchema, DependencyGraphEdgeSchema[]>();
-        for (const element of graph.children) {
-            if (isEdge(element)) {
-                const target = index.getById(element.targetId);
-                if (isNode(target)) {
-                    let arr = incoming.get(target);
-                    if (arr) {
-                        arr.push(element);
-                    } else {
-                        arr = [element];
-                        incoming.set(target, arr);
-                    }
+        for (const edge of edges) {
+            const target = index.getById(edge.targetId);
+            if (isNode(target)) {
+                let arr = incoming.get(target);
+                if (arr) {
+                    arr.push(edge);
+                } else {
+                    arr = [edge];
+                    incoming.set(target, arr);
                 }
             }
         }

@@ -11,7 +11,7 @@ import { injectable, inject, optional } from "inversify";
 import {
     LocalModelSource, TYPES, IActionDispatcher, ActionHandlerRegistry, ViewerOptions,
     IPopupModelProvider, IStateAwareModelProvider, ILogger, SelectAction, FitToScreenAction,
-    SelectAllAction, Action, SelectCommand, SelectAllCommand, IModelLayoutEngine
+    SelectAllAction, Action, SelectCommand, SelectAllCommand, IModelLayoutEngine, SModelElementSchema
 } from "sprotty/lib";
 import { IGraphGenerator } from "./graph-generator";
 import { DependencyGraphNodeSchema, isNode } from "./graph-model";
@@ -33,6 +33,12 @@ export class DepGraphModelSource extends LocalModelSource {
                 @inject(TYPES.IModelLayoutEngine)@optional() layoutEngine?: IModelLayoutEngine
             ) {
         super(actionDispatcher, actionHandlerRegistry, viewerOptions, logger, modelProvider, popupModelProvider, layoutEngine);
+
+        this.currentRoot = {
+            type: 'graph',
+            id: 'npm-dependency-graph',
+            children: []
+        };
     }
 
     protected initialize(registry: ActionHandlerRegistry): void {
@@ -40,10 +46,6 @@ export class DepGraphModelSource extends LocalModelSource {
 
         registry.register(SelectCommand.KIND, this);
         registry.register(SelectAllCommand.KIND, this);
-    }
-
-    start(): void {
-        this.currentRoot = this.graphGenerator.graph;
     }
 
     select(elementIds: string[]): Promise<void> {
@@ -78,9 +80,9 @@ export class DepGraphModelSource extends LocalModelSource {
         this.loadIndicator(true);
 
         this.graphFilter.setFilter(text);
-        this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
+        this.graphFilter.refresh(this.graphGenerator);
         this.actionDispatcher.dispatch(new SelectAllAction(false));
-        const center = this.model.children!.filter(c => isNode(c) && !c.hidden).map(c => c.id);
+        const center = this.graphGenerator.nodes.filter(n => !n.hidden).map(c => c.id);
         await this.updateModel();
 
         this.loadIndicator(false);
@@ -94,8 +96,8 @@ export class DepGraphModelSource extends LocalModelSource {
             this.loadIndicator(true);
             await this.updateModel();
             this.loadIndicator(false);
-            this.select([node.id]);
         }
+        this.select([node.id]);
     }
 
     async resolveNodes(nodes: DependencyGraphNodeSchema[]): Promise<void> {
@@ -118,7 +120,7 @@ export class DepGraphModelSource extends LocalModelSource {
             }
         }
         await Promise.all(promises)
-        this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
+        this.graphFilter.refresh(this.graphGenerator);
         await this.updateModel();
 
         this.loadIndicator(false);
@@ -128,7 +130,7 @@ export class DepGraphModelSource extends LocalModelSource {
     async resolveGraph(): Promise<void> {
         this.loadIndicator(true);
 
-        let nodes = this.model.children!.filter(c => isNode(c) && !c.resolved) as DependencyGraphNodeSchema[];
+        let nodes = this.graphGenerator.nodes.filter(n => !n.hidden && !n.resolved) as DependencyGraphNodeSchema[];
         while (nodes.length > 0) {
             const newNodes: DependencyGraphNodeSchema[] = [];
             const promises: Promise<void>[] = [];
@@ -144,8 +146,8 @@ export class DepGraphModelSource extends LocalModelSource {
             await Promise.all(promises);
             nodes = newNodes;
         }
-        this.graphFilter.refresh(this.graphGenerator.graph, this.graphGenerator.index);
-        const center = this.model.children!.filter(c => isNode(c) && !c.hidden).map(c => c.id);
+        this.graphFilter.refresh(this.graphGenerator);
+        const center = this.graphGenerator.nodes.filter(n => !n.hidden).map(c => c.id);
         await this.updateModel();
 
         this.loadIndicator(false);
@@ -153,12 +155,29 @@ export class DepGraphModelSource extends LocalModelSource {
     }
 
     clear(): Promise<void> {
-        for (const element of this.model.children!) {
-            this.graphGenerator.index.remove(element);
-        }
-        this.model.children = [];
+        const gen = this.graphGenerator;
+        gen.nodes.forEach(n => gen.index.remove(n));
+        gen.nodes.splice(0, gen.nodes.length);
+        gen.edges.forEach(e => gen.index.remove(e));
+        gen.edges.splice(0, gen.edges.length);
         this.graphFilter.setFilter('');
         return this.updateModel();
+    }
+
+    updateModel(): Promise<void> {
+        const gen = this.graphGenerator;
+        const nodes: SModelElementSchema[] = gen.nodes.filter(n => !n.hidden);
+        const edges: SModelElementSchema[] = gen.edges.filter(e => {
+            const source = gen.index.getById(e.sourceId);
+            if (isNode(source) && source.hidden)
+                return false;
+            const target = gen.index.getById(e.targetId);
+            if (isNode(target) && target.hidden)
+                return false;
+            return true;
+        });
+        this.currentRoot.children = nodes.concat(edges);
+        return super.updateModel();
     }
 
     handle(action: Action): void {
