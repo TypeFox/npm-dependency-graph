@@ -3,11 +3,9 @@
 FROM kkarczmarczyk/node-yarn:latest
 USER root
 RUN useradd -m depgraph
+ADD --chown=depgraph . /home/depgraph/npm-dependency-graph
 
 USER depgraph
-WORKDIR /home/depgraph
-ADD --chown=depgraph . npm-dependency-graph
-
 WORKDIR /home/depgraph/npm-dependency-graph
 RUN yarn install
 
