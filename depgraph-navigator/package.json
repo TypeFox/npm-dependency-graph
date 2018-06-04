@@ -13,10 +13,10 @@
   "dependencies": {
     "@theia/core": "latest",
     "@theia/navigator": "latest",
-    "elkjs": "^0.3.0",
+    "elkjs": "latest",
     "semver": "^5.5.0",
-    "sprotty": "0.3.0",
-    "theia-sprotty": "^0.1.14"
+    "sprotty": "latest",
+    "theia-sprotty": "latest"
   },
   "devDependencies": {
     "rimraf": "latest",

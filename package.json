@@ -1,7 +1,6 @@
 {
   "private": true,
   "scripts": {
-    "install": "rimraf node_modules/devbridge-autocomplete/node_modules",
     "prepare": "lerna run prepare",
     "rebuild:browser": "theia rebuild:browser",
     "rebuild:electron": "theia rebuild:electron"
@@ -9,6 +8,10 @@
   "devDependencies": {
     "lerna": "2.4.0",
     "rimraf": "2.6.2"
+  },
+  "resolutions": {
+    "**/devbridge-autocomplete/@types/jquery": "3.3.1",
+    "**/sprotty": "0.4.0"
   },
   "workspaces": [
     "depgraph-navigator",

@@ -22,7 +22,7 @@
     "@theia/cli": "latest"
   },
   "scripts": {
-    "prepare": "theia build",
+    "prepare": "theia build --mode development",
     "build": "theia build --mode development",
     "watch": "theia build --mode development --watch",
     "start": "theia start"
