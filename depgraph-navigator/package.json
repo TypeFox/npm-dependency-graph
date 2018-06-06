@@ -1,11 +1,27 @@
 {
   "name": "depgraph-navigator",
+  "version": "0.0.0",
   "description": "A Theia extension that visualizes npm package dependencies",
   "license": "Apache-2.0",
   "keywords": [
-    "theia-extension"
+    "theia-extension", "npm", "dependencies", "graph"
   ],
-  "version": "0.0.0",
+  "homepage": "http://npm-dependencies.com/",
+  "bugs": "https://github.com/TypeFox/npm-dependency-graph/issues",
+  "author": {
+    "name": "TypeFox"
+  },
+  "contributors": [
+    {
+      "name": "Miro Spönemann",
+      "email": "miro.spoenemann@typefox.io",
+      "url": "https://typefox.io"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TypeFox/npm-dependency-graph.git"
+  },
   "files": [
     "lib",
     "src"
