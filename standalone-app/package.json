@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^4.1.0",
-    "@types/jquery": "^3.3.1",
+    "@types/jquery": "^3.3.2",
     "@types/node": "^10.0.4",
     "rimraf": "latest",
     "typescript": "latest",

@@ -10,7 +10,7 @@
     "rimraf": "2.6.2"
   },
   "resolutions": {
-    "**/devbridge-autocomplete/@types/jquery": "3.3.1",
+    "**/devbridge-autocomplete/@types/jquery": "3.3.2",
     "**/sprotty": "0.4.0"
   },
   "workspaces": [

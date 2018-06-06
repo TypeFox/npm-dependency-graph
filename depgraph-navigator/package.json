@@ -27,12 +27,12 @@
     "src"
   ],
   "dependencies": {
-    "@theia/core": "latest",
-    "@theia/navigator": "latest",
+    "@theia/core": "next",
+    "@theia/navigator": "next",
     "elkjs": "latest",
     "semver": "^5.5.0",
     "sprotty": "latest",
-    "theia-sprotty": "latest"
+    "theia-sprotty": "next"
   },
   "devDependencies": {
     "rimraf": "latest",
