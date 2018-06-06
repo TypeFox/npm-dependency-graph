@@ -168,6 +168,32 @@ jQuery(() => {
             left: packageInput.offset()!.left + packageInput.width()! + horizontalOffset
         });
     }
-    updateIndicatorBounds();
     jQuery(window).resize(updateIndicatorBounds);
+
+    //---------------------------------------------------------
+    // Layout: adapt the content widget height to the window size
+    const updateContentSize = () => {
+        const contentHeight = jQuery(window).height()! - 280;
+        jQuery('.content-widget').height(contentHeight);
+    }
+    jQuery(window).resize(updateContentSize);
+
+
+    //---------------------------------------------------------
+    // Initialize the layout
+    function animationFrames(number: number): Promise<void> {
+        return new Promise(resolve => {
+            function recurse(n: number): void {
+                if (n === 0)
+                    resolve();
+                else
+                    window.requestAnimationFrame(() => recurse(n - 1));
+            }
+            recurse(number);
+        });
+    }
+    animationFrames(2).then(() => {
+        updateIndicatorBounds();
+        updateContentSize();
+    });
 });
