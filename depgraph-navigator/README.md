@@ -5,3 +5,5 @@ A visualization of npm package dependencies that can be installed as a [Theia](h
 Graphs are visualized using [Sprotty](https://www.npmjs.com/package/sprotty) and automatically arranged by [ELK](https://www.npmjs.com/package/elkjs).
 
 Sprotty uses [dependency injection](https://www.npmjs.com/package/inversify) to configure the application, so you can change every aspect of this visualization by binding your own custom classes. This even allows you to reuse this package to display other kinds of dependencies, e.g. Maven or Python modules.
+
+For more details, [read this blog post](http://typefox.io/visualizing-npm-package-dependencies-with-sprotty).
