@@ -2,7 +2,9 @@
 
 ![Dependency graph of sprotty](https://raw.githubusercontent.com/TypeFox/npm-dependency-graph/master/screenshot.png)
 
-This project renders dependency graphs of npm packages. It uses [the npm registry](https://github.com/npm/registry) to obtain package metadata, [sprotty](https://github.com/theia-ide/sprotty) for rendering the graphs, and [ELK](https://www.eclipse.org/elk/) for automatic layout. It can be run either as a standalone application with a simple web page or as a [Theia](https://www.theia-ide.org) extension. Theia supports both the web browser and [Electron](https://electronjs.org). The standalone application is available at [npm-dependencies.com](http://npm-dependencies.com/).
+This project renders dependency graphs of npm packages. It uses [the npm registry](https://github.com/npm/registry) to obtain package metadata, [sprotty](https://github.com/theia-ide/sprotty) for rendering the graphs, and [ELK](https://www.eclipse.org/elk/) for automatic layout. It can be run either as a standalone application with a simple web page or as a [Theia](https://www.theia-ide.org) extension. Theia supports both the web browser and [Electron](https://electronjs.org).
+
+The standalone application is available at [npm-dependencies.com](http://npm-dependencies.com/). Find more details on this project [in this blog post](http://typefox.io/visualizing-npm-package-dependencies-with-sprotty).
 
 ### Building
 
