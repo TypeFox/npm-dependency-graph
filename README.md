@@ -1,3 +1,5 @@
+[![Gitpod - Code Now](https://img.shields.io/badge/Gitpod-code%20now-blue.svg?longCache=true)](https://gitpod.io#https://github.com/typefox/npm-dependency-graph)
+
 ## Package Dependency Graph for npm
 
 ![Dependency graph of sprotty](https://raw.githubusercontent.com/TypeFox/npm-dependency-graph/master/screenshot.png)
