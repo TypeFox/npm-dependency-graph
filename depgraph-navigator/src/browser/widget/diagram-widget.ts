@@ -7,24 +7,33 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { Widget } from "@phosphor/widgets";
+import { Widget } from '@phosphor/widgets';
 import { Message } from '@phosphor/messaging/lib';
-import { DiagramWidget, DiagramWidgetOptions } from "theia-sprotty/lib";
-import { SearchBoxFactory, SearchBox } from "@theia/navigator/lib/browser/search-box";
-import { DepGraphModelSource } from "../graph/model-source";
+import { TYPES } from 'sprotty';
+import { DiagramWidget, DiagramWidgetOptions, TheiaSprottyConnector } from 'sprotty-theia';
+import { SearchBoxFactory, SearchBox } from '@theia/core/lib/browser/tree/search-box';
+import { DepGraphModelSource } from '../graph/model-source';
+import { Container } from 'inversify';
 
 export class DepGraphWidget extends DiagramWidget {
 
     protected readonly searchBox: SearchBox;
 
-    constructor(options: DiagramWidgetOptions,
-                searchBoxFactory: SearchBoxFactory) {
-        super(options);
+    get modelSource(): DepGraphModelSource {
+        return this.diContainer.get(TYPES.ModelSource);
+    }
+
+    get diagramType(): string {
+        return this.options.diagramType;
+    }
+
+    constructor(options: DiagramWidgetOptions, searchBoxFactory: SearchBoxFactory, id: string, diContainer: Container, connector?: TheiaSprottyConnector) {
+        super(options, id, diContainer, connector);
         this.searchBox = searchBoxFactory({ delay: 300 });
         this.toDispose.pushAll([
             this.searchBox,
-            this.searchBox.onTextChange(data => (this.modelSource as DepGraphModelSource).filter(data || '')),
-            this.searchBox.onClose(() => (this.modelSource as DepGraphModelSource).filter(''))
+            this.searchBox.onTextChange(data => (this.modelSource).filter(data || '')),
+            this.searchBox.onClose(() => (this.modelSource).filter(''))
         ]);
     }
 

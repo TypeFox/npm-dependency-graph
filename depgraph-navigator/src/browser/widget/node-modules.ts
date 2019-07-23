@@ -7,13 +7,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { injectable } from "inversify";
-import URI from "@theia/core/lib/common/uri";
-import { Path } from "@theia/core/lib/common";
-import { FileSystem } from "@theia/filesystem/lib/common";
-import { DependencyGraphNodeSchema } from "../graph/graph-model";
-import { VersionMetadata } from "../graph/registry-metadata";
-import { NpmDependencyGraphGenerator } from "../graph/npm-dependencies";
+import { injectable } from 'inversify';
+import URI from '@theia/core/lib/common/uri';
+import { Path } from '@theia/core/lib/common';
+import { FileSystem } from '@theia/filesystem/lib/common';
+import { DependencyGraphNodeSchema } from '../graph/graph-model';
+import { VersionMetadata } from '../graph/registry-metadata';
+import { NpmDependencyGraphGenerator } from '../graph/npm-dependencies';
 
 @injectable()
 export class NodeModulesGraphGenerator extends NpmDependencyGraphGenerator {

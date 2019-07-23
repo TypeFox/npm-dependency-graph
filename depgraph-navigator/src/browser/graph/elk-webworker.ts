@@ -8,7 +8,7 @@
  */
 
 import ElkConstructor from 'elkjs/lib/elk-api';
-import { ElkFactory } from "./graph-layout";
+import { ElkFactory } from 'sprotty-elk';
 
 const elkFactory: ElkFactory = () => new ElkConstructor({
     workerUrl: 'elk/elk-worker.min.js',

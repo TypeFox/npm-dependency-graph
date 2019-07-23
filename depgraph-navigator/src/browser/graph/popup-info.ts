@@ -5,11 +5,11 @@
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { injectable } from "inversify";
+import { injectable } from 'inversify';
 import {
     SModelElementSchema, RequestPopupModelAction, SModelRootSchema, PreRenderedElementSchema, IPopupModelProvider
-} from "sprotty/lib";
-import { DependencyGraphNodeSchema } from "./graph-model";
+} from 'sprotty';
+import { DependencyGraphNodeSchema } from './graph-model';
 
 @injectable()
 export class PopupModelProvider implements IPopupModelProvider {
@@ -37,9 +37,9 @@ export class PopupModelProvider implements IPopupModelProvider {
 
             let body = '';
             if (node.error)
-                body = node.error;
+                body = escapeHTML(node.error);
             else if (node.description)
-                body = node.description;
+                body = escapeHTML(node.description);
             else if (!node.resolved)
                 body = 'This package has not been resolved yet. Select it to trigger resolution of package metadata.';
 
@@ -63,4 +63,8 @@ export class PopupModelProvider implements IPopupModelProvider {
         return undefined;
     }
 
+}
+
+function escapeHTML(s: string): string {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }

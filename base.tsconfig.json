@@ -1,21 +1,26 @@
 {
     "compilerOptions": {
-        "strict": true,
-        "experimentalDecorators": true,
-        "noUnusedLocals": true,
-        "emitDecoratorMetadata": true,
-        "downlevelIteration": true,
-        "module": "commonjs",
-        "moduleResolution": "node",
         "target": "es5",
+        "module": "commonjs",
         "lib": [
-            "es6",
-            "dom"
+            "es6", "dom"
+        ],
+        "types": [
+            "node", "reflect-metadata"
         ],
         "typeRoots": [
-            "typings"
+            "node_modules/@types", "typings"
         ],
+        "skipLibCheck": true,
         "sourceMap": true,
-        "declaration": true
+        "declaration": true,
+        "declarationMap": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "strictNullChecks": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
     }
 }

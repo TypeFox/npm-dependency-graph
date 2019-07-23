@@ -19,15 +19,16 @@
     "@types/bootstrap": "^4.1.0",
     "@types/jquery": "^3.3.2",
     "@types/node": "^10.0.4",
-    "rimraf": "latest",
-    "typescript": "latest",
+    "rimraf": "^2.6.1",
+    "typescript": "^3.1.3",
     "uglify-loader": "^2.0.0",
-    "webpack": "^3.11.0"
+    "webpack": "^3.12.0"
   },
   "scripts": {
     "prepare": "yarn run clean && yarn run build",
     "clean": "rimraf lib app/bootstrap app/jquery app/sprotty app/bundle.js app/bundle.js.map",
-    "build": "tsc && webpack --env.uglify",
+    "build": "tsc && webpack --env.production",
+    "build:dev": "tsc && webpack",
     "watch": "webpack --watch",
     "start": "node lib/backend/server"
   }

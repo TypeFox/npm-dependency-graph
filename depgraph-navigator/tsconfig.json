@@ -2,11 +2,9 @@
     "extends": "../base.tsconfig.json",
     "compilerOptions": {
         "rootDir": "src",
-        "outDir": "lib",
-        "jsx": "react",
-        "reactNamespace": "JSX"
+        "outDir": "lib"
     },
     "include": [
-        "src"
+        "src", "../typings"
     ]
 }

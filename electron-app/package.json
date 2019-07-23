@@ -3,6 +3,7 @@
   "name": "electron-app",
   "version": "0.1.0",
   "dependencies": {
+    "@theia/electron": "next",
     "@theia/core": "next",
     "@theia/filesystem": "next",
     "@theia/workspace": "next",

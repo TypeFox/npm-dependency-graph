@@ -9,7 +9,7 @@
 
 import {
     RectangularNode, moveFeature, SEdge, editFeature, SNodeSchema, SEdgeSchema, SModelElementSchema
-} from "sprotty/lib";
+} from 'sprotty';
 
 export interface DependencyGraphNodeSchema extends SNodeSchema {
     name: string

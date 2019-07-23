@@ -7,12 +7,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { injectable } from "inversify";
-import { maxSatisfying } from "semver";
-import { SModelIndex, SModelElementSchema, SLabelSchema } from "sprotty/lib";
-import { IGraphGenerator } from "./graph-generator";
-import { DependencyGraphNodeSchema, DependencyGraphEdgeSchema } from "./graph-model";
-import { PackageMetadata, VersionMetadata } from "./registry-metadata";
+import { injectable } from 'inversify';
+import { maxSatisfying } from 'semver';
+import { SModelIndex, SModelElementSchema, SLabelSchema } from 'sprotty';
+import { IGraphGenerator } from './graph-generator';
+import { DependencyGraphNodeSchema, DependencyGraphEdgeSchema } from './graph-model';
+import { PackageMetadata, VersionMetadata } from './registry-metadata';
 
 export const REGISTRY_URL = 'https://registry.npmjs.org';
 export const WEBSITE_URL = 'https://www.npmjs.com';

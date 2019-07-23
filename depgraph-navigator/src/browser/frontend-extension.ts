@@ -7,20 +7,16 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { ContainerModule } from "inversify";
+import { ContainerModule } from 'inversify';
 import { CommandContribution, MenuContribution } from '@theia/core/lib/common';
-import { FrontendApplicationContribution, OpenHandler, KeybindingContribution, KeybindingContext } from "@theia/core/lib/browser";
-import { SearchBoxFactory } from "@theia/navigator/lib/browser/search-box";
-import {
-    DiagramConfiguration, DiagramManagerProvider, DiagramManager, DiagramWidgetFactory, DiagramWidget, DiagramWidgetOptions
-} from 'theia-sprotty/lib';
-import { DepGraphDiagramConfiguration } from "./widget/diagram-config";
-import { DepGraphDiagramManager } from "./widget/diagram-manager";
-import { DepGraphWidget } from "./widget/diagram-widget";
-import { DiagramCommandContribution, DepgraphKeybindingContext } from "./widget/diagram-commands";
+import { FrontendApplicationContribution, OpenHandler, KeybindingContribution, KeybindingContext, WidgetFactory } from '@theia/core/lib/browser';
+import { DiagramConfiguration, DiagramManagerProvider, DiagramManager } from 'sprotty-theia';
+import { DepGraphDiagramConfiguration } from './widget/diagram-config';
+import { DepGraphDiagramManager } from './widget/diagram-manager';
+import { DiagramCommandContribution, DepgraphKeybindingContext } from './widget/diagram-commands';
 
 import 'sprotty/css/sprotty.css';
-import 'theia-sprotty/css/theia-sprotty.css';
+import 'sprotty-theia/css/theia-sprotty.css';
 import '../../src/browser/style/depgraph.css';
 
 export default new ContainerModule(bind => {
@@ -29,16 +25,13 @@ export default new ContainerModule(bind => {
     bind(DiagramManagerProvider).toProvider<DiagramManager>(context => {
         return () => Promise.resolve(context.container.get(DepGraphDiagramManager));
     }).whenTargetNamed('dependency-graph');
-    bind(DiagramWidgetFactory).toFactory<DiagramWidget>(context => {
-        const searchBoxFactory = context.container.get<SearchBoxFactory>(SearchBoxFactory);
-        return (options: DiagramWidgetOptions) => new DepGraphWidget(options, searchBoxFactory);
-    });
-    bind(FrontendApplicationContribution).toDynamicValue(context => context.container.get(DepGraphDiagramManager));
-    bind(OpenHandler).toDynamicValue(context => context.container.get(DepGraphDiagramManager));
+    bind(FrontendApplicationContribution).toService(DepGraphDiagramManager);
+    bind(OpenHandler).toService(DepGraphDiagramManager);
+    bind(WidgetFactory).toService(DepGraphDiagramManager);
     bind(DepgraphKeybindingContext).toSelf().inSingletonScope();
-    bind(KeybindingContext).toDynamicValue(context => context.container.get(DepgraphKeybindingContext));
+    bind(KeybindingContext).toService(DepgraphKeybindingContext);
     bind(DiagramCommandContribution).toSelf().inSingletonScope();
-    bind(CommandContribution).toDynamicValue(context => context.container.get(DiagramCommandContribution));
-    bind(KeybindingContribution).toDynamicValue(context => context.container.get(DiagramCommandContribution));
-    bind(MenuContribution).toDynamicValue(context => context.container.get(DiagramCommandContribution));
+    bind(CommandContribution).toService(DiagramCommandContribution);
+    bind(KeybindingContribution).toService(DiagramCommandContribution);
+    bind(MenuContribution).toService(DiagramCommandContribution);
 });

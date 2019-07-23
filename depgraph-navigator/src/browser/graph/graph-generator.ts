@@ -7,8 +7,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { SModelIndex, SModelElementSchema } from "sprotty/lib";
-import { DependencyGraphNodeSchema, DependencyGraphEdgeSchema } from "./graph-model";
+import { SModelIndex, SModelElementSchema } from 'sprotty';
+import { DependencyGraphNodeSchema, DependencyGraphEdgeSchema } from './graph-model';
 
 export interface IGraphGenerator {
 

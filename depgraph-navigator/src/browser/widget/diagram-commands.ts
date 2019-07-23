@@ -7,11 +7,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { injectable, inject } from "inversify";
+import { injectable, inject } from 'inversify';
 import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry } from '@theia/core/lib/common';
-import { KeybindingContribution, KeybindingRegistry, ApplicationShell, KeybindingContext, Keybinding } from "@theia/core/lib/browser";
-import { DiagramMenus, DiagramWidget } from "theia-sprotty/lib";
-import { DepGraphModelSource } from "../graph/model-source";
+import { KeybindingContribution, KeybindingRegistry, ApplicationShell, KeybindingContext, Keybinding } from '@theia/core/lib/browser';
+import { DiagramMenus, DiagramWidget } from 'sprotty-theia';
+import { DepGraphModelSource } from '../graph/model-source';
+import { DepGraphWidget } from './diagram-widget';
 
 export const RESOLVE_GRAPH = 'diagram.resolveGraph'
 
@@ -24,7 +25,7 @@ export class DepgraphKeybindingContext implements KeybindingContext {
 
     isEnabled(arg?: Keybinding) {
         const widget = this.shell.currentWidget;
-        return widget instanceof DiagramWidget && widget.diagramType === 'dependency-graph';
+        return widget instanceof DepGraphWidget && widget.diagramType === 'dependency-graph';
     }
 }
 
@@ -37,7 +38,7 @@ export class DiagramCommandContribution implements CommandContribution, Keybindi
     registerCommands(registry: CommandRegistry): void {
         const checkCurrentWidget = () => {
             const widget = this.shell.currentWidget;
-            return widget instanceof DiagramWidget && widget.diagramType === 'dependency-graph';
+            return widget instanceof DepGraphWidget && widget.diagramType === 'dependency-graph';
         };
         registry.registerCommand({
             id: RESOLVE_GRAPH,

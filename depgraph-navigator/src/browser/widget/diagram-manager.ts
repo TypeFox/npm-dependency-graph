@@ -7,18 +7,20 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { injectable, inject } from "inversify";
-import URI from "@theia/core/lib/common/uri";
-import { OpenerOptions } from "@theia/core/lib/browser";
-import { FileSystem } from "@theia/filesystem/lib/common";
-import { DiagramManagerImpl, DiagramWidget, DiagramWidgetFactory } from "theia-sprotty/lib";
+import { injectable, inject } from 'inversify';
+import URI from '@theia/core/lib/common/uri';
+import { WidgetOpenerOptions, Widget } from '@theia/core/lib/browser';
+import { SearchBoxFactory, SearchBoxProps, SearchBox } from '@theia/core/lib/browser/tree/search-box';
+import { FileSystem } from '@theia/filesystem/lib/common';
+import { DiagramManager, DiagramWidgetOptions } from 'sprotty-theia';
 import { DepGraphModelSource } from '../graph/model-source';
-import { NodeModulesGraphGenerator } from "./node-modules";
+import { NodeModulesGraphGenerator } from './node-modules';
+import { DepGraphWidget } from './diagram-widget';
+import { SearchBoxDebounce } from '@theia/core/lib/browser/tree/search-box-debounce';
 
 @injectable()
-export class DepGraphDiagramManager extends DiagramManagerImpl {
+export class DepGraphDiagramManager extends DiagramManager {
     
-    @inject(DiagramWidgetFactory) private readonly _diagramWidgetFactory!: DiagramWidgetFactory;
     @inject(FileSystem) protected readonly fileSystem!: FileSystem;
 
     readonly diagramType: string = 'dependency-graph';
@@ -26,17 +28,23 @@ export class DepGraphDiagramManager extends DiagramManagerImpl {
     iconClass: string = 'fa fa-arrow-circle-o-up';
     label: string = 'Dependency Graph';
 
-    canHandle(uri: URI, options?: OpenerOptions): number {
+    canHandle(uri: URI, options?: WidgetOpenerOptions | undefined): number {
         if (uri.path.base === 'package.json')
             return 10;
         else
             return 0;
     }
 
-    protected createDiagramWidget(uri: URI): DiagramWidget {
-        const widget = super.createDiagramWidget(uri);
-        this.createModel(uri, widget.modelSource as DepGraphModelSource);
-        return widget;
+    async createWidget(options?: any): Promise<Widget> {
+        if (DiagramWidgetOptions.is(options)) {
+            const clientId = this.createClientId();
+            const config = this.diagramConfigurationRegistry.get(options.diagramType);
+            const diContainer = config.createContainer(clientId + '_sprotty');
+            const diagramWidget = new DepGraphWidget(options, createSearchBox, clientId, diContainer, this.diagramConnector);
+            this.createModel(new URI(options.uri), diagramWidget.modelSource);
+            return diagramWidget;
+        }
+        throw Error('DiagramWidgetFactory needs DiagramWidgetOptions but got ' + JSON.stringify(options));
     }
 
     protected async createModel(uri: URI, modelSource: DepGraphModelSource): Promise<void> {
@@ -60,10 +68,6 @@ export class DepGraphDiagramManager extends DiagramManagerImpl {
         modelSource.center([node.id]);
     }
 
-    get diagramWidgetFactory(): DiagramWidgetFactory {
-        return this._diagramWidgetFactory;
-    }
-
 }
 
 function animationFrames(number: number): Promise<void> {
@@ -80,3 +84,8 @@ function animationFrames(number: number): Promise<void> {
         recurse(number);
     });
 }
+
+export const createSearchBox: SearchBoxFactory = (props: SearchBoxProps) => {
+    const debounce = new SearchBoxDebounce({ delay: 300 });
+    return new SearchBox(props, debounce);
+};

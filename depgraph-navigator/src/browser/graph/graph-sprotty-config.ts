@@ -12,15 +12,17 @@ import {
     TYPES, ConsoleLogger, LogLevel, SGraphFactory, configureModelElement, SGraph,
     SGraphView, HtmlRoot, HtmlRootView, PreRenderedElement, PreRenderedView, SLabel,
     SLabelView, SCompartment, SCompartmentView, defaultModule, selectModule, moveModule,
-    boundsModule, fadeModule, viewportModule, exportModule, hoverModule, edgeEditModule
-} from 'sprotty/lib';
+    boundsModule, fadeModule, viewportModule, exportModule, hoverModule, edgeEditModule,
+    updateModule, graphModule, routingModule, edgeLayoutModule, modelSourceModule
+} from 'sprotty';
+import { ILayoutConfigurator, elkLayoutModule } from 'sprotty-elk';
 import { DependencyGraphNode, DependencyGraphEdge } from './graph-model';
 import { IGraphGenerator } from './graph-generator';
 import { DepGraphModelSource } from './model-source';
 import { NpmDependencyGraphGenerator } from './npm-dependencies';
 import { DependencyNodeView, DependencyEdgeView } from './graph-views';
 import { PopupModelProvider } from './popup-info';
-import { ElkGraphLayout } from './graph-layout';
+import { DepGraphLayoutConfigurator } from './graph-layout';
 import { DependencyGraphFilter } from './graph-filter';
 
 export default (additionalBindings?: interfaces.ContainerModuleCallBack) => {
@@ -28,7 +30,7 @@ export default (additionalBindings?: interfaces.ContainerModuleCallBack) => {
         bind(DependencyGraphFilter).toSelf();
         bind(IGraphGenerator).to(NpmDependencyGraphGenerator).inSingletonScope();
         bind(TYPES.ModelSource).to(DepGraphModelSource).inSingletonScope();
-        bind(TYPES.IModelLayoutEngine).to(ElkGraphLayout);
+        rebind(ILayoutConfigurator).to(DepGraphLayoutConfigurator);
         bind(TYPES.IPopupModelProvider).to(PopupModelProvider);
         rebind(TYPES.ILogger).to(ConsoleLogger).inSingletonScope();
         rebind(TYPES.LogLevel).toConstantValue(LogLevel.warn);
@@ -41,12 +43,14 @@ export default (additionalBindings?: interfaces.ContainerModuleCallBack) => {
         configureModelElement(context, 'compartment', SCompartment, SCompartmentView);
         configureModelElement(context, 'html', HtmlRoot, HtmlRootView);
         configureModelElement(context, 'pre-rendered', PreRenderedElement, PreRenderedView);
-        if (additionalBindings)
+        if (additionalBindings) {
             additionalBindings(bind, unbind, isBound, rebind);
+        }
     });
 
     const container = new Container();
-    container.load(defaultModule, selectModule, moveModule, boundsModule, fadeModule, viewportModule,
-        exportModule, hoverModule, edgeEditModule, depGraphModule);
+    container.load(defaultModule, graphModule, updateModule, modelSourceModule, routingModule,
+        selectModule, moveModule, boundsModule, fadeModule, viewportModule, exportModule,
+        hoverModule, edgeLayoutModule, edgeEditModule, elkLayoutModule, depGraphModule);
     return container;
 };

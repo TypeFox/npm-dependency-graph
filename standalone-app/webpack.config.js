@@ -10,39 +10,47 @@
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const buildRoot = path.resolve(__dirname, 'lib');
-const appRoot = path.resolve(__dirname, 'app');
-const bootstrapDistPath = '../node_modules/bootstrap/dist';
-const jqueryDistPath = '../node_modules/jquery/dist';
-const sprottyCssPath = '../node_modules/sprotty/css';
-const elkWorkerPath = '../node_modules/elkjs/lib/elk-worker.min.js';
-
 module.exports = function(env) {
     if (!env) {
         env = {}
     }
+
+    const buildRoot = path.resolve(__dirname, 'lib');
+    const appRoot = path.resolve(__dirname, 'app');
+    const bootstrapDistPath = '../node_modules/bootstrap/dist';
+    const jqueryDistPath = '../node_modules/jquery/dist';
+    const sprottyCssPath = '../node_modules/sprotty/css';
+    const elkWorkerPath = '../node_modules/elkjs/lib/elk-worker.min.js';
+
+    const rules = [];
+    if (env.production) {
+        rules.push({
+            test: /.*\.js$/,
+            exclude: /snabbdom(\/|\\)es|fontawesome(\/|\\)index.es.js|popper.js(\/|\\)dist(\/|\\)esm/,
+            loader: 'uglify-loader'
+        });
+    } else {
+        rules.push({
+            test: /\.js$/,
+            enforce: 'pre',
+            loader: 'source-map-loader'
+        });
+    }
+
     return {
         entry: {
-            elkgraph: path.resolve(buildRoot, 'frontend/main'),
+            depgraph: path.resolve(buildRoot, 'frontend/main'),
         },
         output: {
             filename: 'bundle.js',
             path: appRoot
         },
-        module: {
-            loaders: env.uglify ? [
-                {
-                    test: /.*\.js$/,
-                    exclude: /snabbdom(\/|\\)es|fontawesome(\/|\\)index.es.js|popper.js(\/|\\)dist(\/|\\)esm/,
-                    loader: 'uglify-loader'
-                }
-            ] : []
-        },
+        target: 'web',
+        module: { rules },
         resolve: {
             extensions: ['.js']
         },
         devtool: 'source-map',
-        target: 'web',
         node: {
             fs: 'empty',
             child_process: 'empty',

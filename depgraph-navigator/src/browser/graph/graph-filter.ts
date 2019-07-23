@@ -7,10 +7,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { injectable } from "inversify";
-import { SModelIndex, SModelElementSchema } from "sprotty/lib";
-import { DependencyGraphNodeSchema, DependencyGraphEdgeSchema, isNode } from "./graph-model";
-import { IGraphGenerator } from "./graph-generator";
+import { injectable } from 'inversify';
+import { SModelIndex, SModelElementSchema } from 'sprotty';
+import { DependencyGraphNodeSchema, DependencyGraphEdgeSchema, isNode } from './graph-model';
+import { IGraphGenerator } from './graph-generator';
 
 @injectable()
 export class DependencyGraphFilter {

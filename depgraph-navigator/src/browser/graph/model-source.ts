@@ -7,33 +7,27 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { injectable, inject, optional } from "inversify";
+import { injectable, inject, postConstruct } from 'inversify';
 import {
-    LocalModelSource, TYPES, IActionDispatcher, ActionHandlerRegistry, ViewerOptions,
-    IPopupModelProvider, IStateAwareModelProvider, ILogger, SelectAction, FitToScreenAction,
-    SelectAllAction, Action, SelectCommand, SelectAllCommand, IModelLayoutEngine, SModelElementSchema
-} from "sprotty/lib";
-import { IGraphGenerator } from "./graph-generator";
-import { DependencyGraphNodeSchema, isNode } from "./graph-model";
-import { DependencyGraphFilter } from "./graph-filter";
+    LocalModelSource, ActionHandlerRegistry, SelectAction, FitToScreenAction,
+    SelectAllAction, Action, SelectCommand, SelectAllCommand, SModelElementSchema
+} from 'sprotty';
+import { IGraphGenerator } from './graph-generator';
+import { DependencyGraphNodeSchema, isNode } from './graph-model';
+import { DependencyGraphFilter } from './graph-filter';
 
 @injectable()
 export class DepGraphModelSource extends LocalModelSource {
 
     loadIndicator: (loadStatus: boolean) => void = () => {};
 
-    constructor(@inject(TYPES.IActionDispatcher) actionDispatcher: IActionDispatcher,
-                @inject(TYPES.ActionHandlerRegistry) actionHandlerRegistry: ActionHandlerRegistry,
-                @inject(TYPES.ViewerOptions) viewerOptions: ViewerOptions,
-                @inject(TYPES.ILogger) logger: ILogger,
-                @inject(IGraphGenerator) public readonly graphGenerator: IGraphGenerator,
-                @inject(DependencyGraphFilter) protected readonly graphFilter: DependencyGraphFilter,
-                @inject(TYPES.StateAwareModelProvider)@optional() modelProvider?: IStateAwareModelProvider,
-                @inject(TYPES.IPopupModelProvider)@optional() popupModelProvider?: IPopupModelProvider,
-                @inject(TYPES.IModelLayoutEngine)@optional() layoutEngine?: IModelLayoutEngine
-            ) {
-        super(actionDispatcher, actionHandlerRegistry, viewerOptions, logger, modelProvider, popupModelProvider, layoutEngine);
+    @inject(IGraphGenerator)
+    public readonly graphGenerator: IGraphGenerator;
+    @inject(DependencyGraphFilter)
+    protected readonly graphFilter: DependencyGraphFilter;
 
+    @postConstruct()
+    protected postConstruct(): void {
         this.currentRoot = {
             type: 'graph',
             id: 'npm-dependency-graph',
@@ -41,7 +35,7 @@ export class DepGraphModelSource extends LocalModelSource {
         };
     }
 
-    protected initialize(registry: ActionHandlerRegistry): void {
+    initialize(registry: ActionHandlerRegistry): void {
         super.initialize(registry);
 
         registry.register(SelectCommand.KIND, this);

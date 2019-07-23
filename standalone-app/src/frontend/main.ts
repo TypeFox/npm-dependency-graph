@@ -15,10 +15,10 @@ import * as faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner';
 import * as faExclamationCircle from '@fortawesome/fontawesome-free-solid/faExclamationCircle';
 import * as faGithub from '@fortawesome/fontawesome-free-brands/faGithub';
 import fontawesome from '@fortawesome/fontawesome';
-import { TYPES } from 'sprotty/lib';
+import { TYPES } from 'sprotty';
+import { ElkFactory } from 'sprotty-elk';
 import {
-    containerFactory, DepGraphModelSource, REGISTRY_URL, NpmDependencyGraphGenerator,
-    IGraphGenerator, ElkFactory
+    containerFactory, DepGraphModelSource, REGISTRY_URL, NpmDependencyGraphGenerator, IGraphGenerator
 } from 'depgraph-navigator/lib/browser';
 import elkFactory from 'depgraph-navigator/lib/browser/graph/elk-webworker';
 

@@ -8,7 +8,7 @@
  */
 
 import ElkConstructor from 'elkjs/lib/elk.bundled';
-import { ElkFactory } from "./graph-layout";
+import { ElkFactory } from 'sprotty-elk';
 
 const elkFactory: ElkFactory = () => new ElkConstructor({
     algorithms: ['layered']
