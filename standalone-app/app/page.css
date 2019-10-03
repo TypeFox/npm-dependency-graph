@@ -1,14 +1,20 @@
 /*
  * Copyright (C) 2018 TypeFox
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+html {
+  font-size: 14px;
+}
+
 h2 {
-    margin-bottom: 20px;
+    font-size: 1.75rem;
+    margin-top: 5px;
+    margin-bottom: 10px;
 }
 
 .indicator-icon {
@@ -23,25 +29,37 @@ h2 {
     color: #c66;
 }
 
-.button-bar button {
-    margin-right: 10px;
+.button-bar {
+    display: flex;
+    margin: -5px;
 }
 
-.button-bar input {
-    display: inline;
-    vertical-align: middle;
-    width: auto;
+@media (max-width: 576px) {
+
+  .button-bar {
+    flex-wrap: wrap;
+  }
+
+  .button-bar input {
+    width: 100%;
+    max-width: none !important;
+  }
+}
+
+
+.button-bar > * {
+    margin: 5px;
+    white-space: nowrap;
 }
 
 .content-widget {
     width: 100%;
-    height: 400px;
-    margin: 20px 0px;
-    border: 1px solid #888;
+    height: 100% !important;
+    margin-top: 10px;
+    border-top: 1px solid #ced4da;
 }
 
 .footer {
-    margin-top: 30px;
     padding: 10px;
     background-color: #f8f8f8;
     border-top: 1px solid #e7e7e7;
@@ -61,18 +79,18 @@ h2 {
     height: 100%;
 }
 
-.autocomplete-suggestions { 
+.autocomplete-suggestions {
     border: 1px solid #aaa;
     background: #f0f0f0;
     overflow: auto;
 }
 
-.autocomplete-suggestion { 
-    padding: 2px 5px; 
-    white-space: nowrap; 
-    overflow: hidden; 
+.autocomplete-suggestion {
+    padding: 2px 5px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
-.autocomplete-selected { 
-    background: #ddf; 
+.autocomplete-selected {
+    background: #ddf;
 }

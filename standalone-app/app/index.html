@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="h-100">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,31 +8,32 @@
 	<link rel="stylesheet" href="page.css">
 	<link rel="stylesheet" href="depgraph.css">
 </head>
-<body>
+<body class="h-100 d-flex flex-column">
     <div class="container">
-		<div class="row">
-			<div class="col-md-12">
-                <h2>Package Dependency Graph for npm</h2>
-				<input type="text" id="package-input" class="form-control" placeholder="Type a package name">
+		<div class="row h-100">
+			<div class="col-md-12 d-flex flex-column">
+        <h2>Package Dependency Graph for npm</h2>
+        <div class="button-bar">
+          <input type="text" id="package-input" class="form-control" placeholder="Type a package name">
+          <input type="text" id="filter-input" class="form-control" style="max-width: 300px" placeholder="Filter dependencies"
+            data-content="Show only nodes that contain the text given here, and nodes that have these as dependencies.">
+          <button id="button-clear" class="btn btn-secondary"
+            data-content="Remove all nodes from the diagram and start from scratch.">Clear</button>
+          <button id="button-resolve-all" class="btn btn-secondary"
+            data-content="Resolve all transitive dependencies.">Resolve All</button>
+        </div>
 				<div id="loading-indicator" class="indicator-icon" style="visibility: hidden;">
 					<i class="fas fa-spinner fa-spin fa-2x"></i>
 				</div>
 				<div id="error-indicator" class="indicator-icon" style="visibility: hidden;">
 					<i class="fas fa-exclamation-circle fa-2x"></i>
 				</div>
-				<div id="sprotty" class="content-widget"></div>
-				<div class="button-bar">
-					<button id="button-clear" class="btn btn-secondary"
-						data-content="Remove all nodes from the diagram and start from scratch.">Clear</button>
-					<button id="button-resolve-all" class="btn btn-secondary"
-						data-content="Resolve all transitive dependencies.">Resolve All</button>
-					<input type="text" id="filter-input" class="form-control" placeholder="Filter dependencies"
-						data-content="Show only nodes that contain the text given here, and nodes that have these as dependencies.">
-				</div>
 			</div>
 		</div>
-	</div>
-	
+  </div>
+
+  <div id="sprotty" class="content-widget"></div>
+
 	<footer class="footer">
 		<div class="container">
 			<div class="row">
