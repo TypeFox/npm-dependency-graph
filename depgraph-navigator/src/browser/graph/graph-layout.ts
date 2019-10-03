@@ -18,7 +18,7 @@ export class DepGraphLayoutConfigurator extends DefaultLayoutConfigurator {
     protected graphOptions(sgraph: SGraphSchema, index: SModelIndex<SModelElementSchema>): LayoutOptions {
         return {
             'elk.algorithm': 'layered',
-            'elk.direction': 'RIGHT',
+            'elk.direction': 'LEFT',
             'elk.edgeRouting': 'POLYLINE'
         }
     }
