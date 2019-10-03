@@ -14,6 +14,7 @@ import * as jQuery from 'jquery';
 import * as faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner';
 import * as faExclamationCircle from '@fortawesome/fontawesome-free-solid/faExclamationCircle';
 import * as faGithub from '@fortawesome/fontawesome-free-brands/faGithub';
+import * as faBars from '@fortawesome/fontawesome-free-solid/faBars';
 import fontawesome from '@fortawesome/fontawesome';
 import { TYPES } from 'sprotty';
 import { ElkFactory } from 'sprotty-elk';
@@ -22,7 +23,7 @@ import {
 } from 'depgraph-navigator/lib/browser';
 import elkFactory from 'depgraph-navigator/lib/browser/graph/elk-webworker';
 
-fontawesome.library.add(faSpinner, faExclamationCircle, faGithub);
+fontawesome.library.add(faSpinner, faExclamationCircle, faGithub, faBars);
 
 jQuery(() => {
     const packageInput = jQuery('#package-input');
@@ -139,7 +140,8 @@ jQuery(() => {
     });
 
     //---------------------------------------------------------
-    // Buttons in the button bar
+    // Buttons
+    jQuery('#sidebar-toggle-button').click(() => jQuery('body').toggleClass('sidebar-minimized'))
     jQuery('#button-clear').click(event => {
         modelSource.clear();
         filterInput.val('');

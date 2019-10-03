@@ -12,9 +12,8 @@ html {
 }
 
 h2 {
+    margin-bottom: 1.5rem;
     font-size: 1.75rem;
-    margin-top: 5px;
-    margin-bottom: 10px;
 }
 
 .indicator-icon {
@@ -29,40 +28,48 @@ h2 {
     color: #c66;
 }
 
-.button-bar {
+#sidebar {
+    width: 25rem;
     display: flex;
-    margin: -5px;
+    flex-direction: column;
+    border-right: 1px solid #ced4da;
+    left: 0;
+    transition: .4s all;
 }
 
-@media (max-width: 576px) {
-
-  .button-bar {
-    flex-wrap: wrap;
-  }
-
-  .button-bar input {
-    width: 100%;
-    max-width: none !important;
-  }
+body.sidebar-minimized #sidebar {
+    left: -25rem;
 }
 
+#sidebar main {
+    padding: 1rem;
+    height: 100%;
+}
 
-.button-bar > * {
-    margin: 5px;
-    white-space: nowrap;
+#sidebar footer {
+    padding: 1rem;
+    background-color: #f8f8f8;
+    border-top: 1px solid #e7e7e7;
+}
+
+#sidebar-toggle-button {
+    border-left: 1px solid #ced4da;
+    border-right: 1px solid #ced4da;
+    border-bottom: 1px solid #ced4da;
+    border-radius: 0;
+    border-bottom-right-radius: .25rem;
 }
 
 .content-widget {
-    width: 100%;
-    height: 100% !important;
-    margin-top: 10px;
-    border-top: 1px solid #ced4da;
+  left: 25rem;
+  width: calc(100% - 25rem);
+  height: 100%;
+  transition: .4s all;
 }
 
-.footer {
-    padding: 10px;
-    background-color: #f8f8f8;
-    border-top: 1px solid #e7e7e7;
+body.sidebar-minimized .content-widget {
+  left: 0;
+  width: 100%;
 }
 
 .footer-logo {
