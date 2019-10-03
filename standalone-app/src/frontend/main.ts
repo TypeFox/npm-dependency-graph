@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018 TypeFox
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -171,15 +171,6 @@ jQuery(() => {
     jQuery(window).resize(updateIndicatorBounds);
 
     //---------------------------------------------------------
-    // Layout: adapt the content widget height to the window size
-    const updateContentSize = () => {
-        const contentHeight = jQuery(window).height()! - 280;
-        jQuery('.content-widget').height(contentHeight);
-    }
-    jQuery(window).resize(updateContentSize);
-
-
-    //---------------------------------------------------------
     // Initialize the layout
     function animationFrames(number: number): Promise<void> {
         return new Promise(resolve => {
@@ -192,8 +183,5 @@ jQuery(() => {
             recurse(number);
         });
     }
-    animationFrames(2).then(() => {
-        updateIndicatorBounds();
-        updateContentSize();
-    });
+    animationFrames(2).then(() => updateIndicatorBounds());
 });
