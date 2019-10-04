@@ -1,0 +1,16 @@
+image:
+  file: .gitpod.dockerfile
+
+ports:
+  - port: 3000
+  - port: 3001
+
+tasks:
+  - init: yarn
+    command: |
+      gp sync-done init
+      yarn --cwd browser-app start
+  - command: |
+      gp sync-await init
+      yarn --cwd standalone-app start
+    openMode: split-right

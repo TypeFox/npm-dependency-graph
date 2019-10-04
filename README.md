@@ -1,6 +1,6 @@
-[![Gitpod - Code Now](https://img.shields.io/badge/Gitpod-code%20now-blue.svg?longCache=true)](https://gitpod.io#https://github.com/typefox/npm-dependency-graph)
-
 ## Package Dependency Graph for npm
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/TypeFox/npm-dependency-graph/)
 
 ![Dependency graph of sprotty](https://raw.githubusercontent.com/TypeFox/npm-dependency-graph/master/screenshot.png)
 
@@ -9,6 +9,8 @@ This project renders dependency graphs of npm packages. It uses [the npm registr
 The standalone application is available at [npm-dependencies.com](http://npm-dependencies.com/). Find more details on this project [in this blog post](http://typefox.io/visualizing-npm-package-dependencies-with-sprotty).
 
 ### Building
+
+The easiest way to build and test this application is to [open it in Gitpod](https://gitpod.io/#https://github.com/TypeFox/npm-dependency-graph/). If you would like to do it on your own machine, follow the steps below.
 
 You need [Yarn](https://yarnpkg.com/) in order to build this project.
 
