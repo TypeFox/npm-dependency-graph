@@ -1,14 +1,19 @@
 /*
  * Copyright (C) 2018 TypeFox
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+html {
+  font-size: 14px;
+}
+
 h2 {
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
 }
 
 .indicator-icon {
@@ -23,28 +28,48 @@ h2 {
     color: #c66;
 }
 
-.button-bar button {
-    margin-right: 10px;
+#sidebar {
+    width: 25rem;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #ced4da;
+    left: 0;
+    transition: .4s all;
 }
 
-.button-bar input {
-    display: inline;
-    vertical-align: middle;
-    width: auto;
+body.sidebar-minimized #sidebar {
+    left: -25rem;
+}
+
+#sidebar main {
+    padding: 1rem;
+    height: 100%;
+}
+
+#sidebar footer {
+    padding: 1rem;
+    background-color: #f8f8f8;
+    border-top: 1px solid #e7e7e7;
+}
+
+#sidebar-toggle-button {
+    border-left: 1px solid #ced4da;
+    border-right: 1px solid #ced4da;
+    border-bottom: 1px solid #ced4da;
+    border-radius: 0;
+    border-bottom-right-radius: .25rem;
 }
 
 .content-widget {
-    width: 100%;
-    height: 400px;
-    margin: 20px 0px;
-    border: 1px solid #888;
+  left: 25rem;
+  width: calc(100% - 25rem);
+  height: 100%;
+  transition: .4s all;
 }
 
-.footer {
-    margin-top: 30px;
-    padding: 10px;
-    background-color: #f8f8f8;
-    border-top: 1px solid #e7e7e7;
+body.sidebar-minimized .content-widget {
+  left: 0;
+  width: 100%;
 }
 
 .footer-logo {
@@ -61,18 +86,18 @@ h2 {
     height: 100%;
 }
 
-.autocomplete-suggestions { 
+.autocomplete-suggestions {
     border: 1px solid #aaa;
     background: #f0f0f0;
     overflow: auto;
 }
 
-.autocomplete-suggestion { 
-    padding: 2px 5px; 
-    white-space: nowrap; 
-    overflow: hidden; 
+.autocomplete-suggestion {
+    padding: 2px 5px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
-.autocomplete-selected { 
-    background: #ddf; 
+.autocomplete-selected {
+    background: #ddf;
 }

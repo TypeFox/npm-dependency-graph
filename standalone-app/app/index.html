@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="h-100">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,46 +8,42 @@
 	<link rel="stylesheet" href="page.css">
 	<link rel="stylesheet" href="depgraph.css">
 </head>
-<body>
-    <div class="container">
-		<div class="row">
-			<div class="col-md-12">
-                <h2>Package Dependency Graph for npm</h2>
-				<input type="text" id="package-input" class="form-control" placeholder="Type a package name">
-				<div id="loading-indicator" class="indicator-icon" style="visibility: hidden;">
-					<i class="fas fa-spinner fa-spin fa-2x"></i>
-				</div>
-				<div id="error-indicator" class="indicator-icon" style="visibility: hidden;">
-					<i class="fas fa-exclamation-circle fa-2x"></i>
-				</div>
-				<div id="sprotty" class="content-widget"></div>
-				<div class="button-bar">
-					<button id="button-clear" class="btn btn-secondary"
-						data-content="Remove all nodes from the diagram and start from scratch.">Clear</button>
-					<button id="button-resolve-all" class="btn btn-secondary"
-						data-content="Resolve all transitive dependencies.">Resolve All</button>
-					<input type="text" id="filter-input" class="form-control" placeholder="Filter dependencies"
-						data-content="Show only nodes that contain the text given here, and nodes that have these as dependencies.">
-				</div>
-			</div>
-		</div>
-	</div>
-	
-	<footer class="footer">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-6">
-					Brought to you by <a href="https://typefox.io">TypeFox</a>
-					<a href="https://typefox.io"><img class="footer-logo" src="typefox.svg"></img></a>
-				</div>
-				<div class="col-md-6 text-right">
-					<a href="https://github.com/TypeFox/npm-dependency-graph"><i class="fab fa-github fa-lg footer-icon"></i></a>
-					Powered by <a href="https://github.com/theia-ide/sprotty">sprotty</a>
-					and <a href="https://www.eclipse.org/elk/">ELK</a>
-				</div>
-			</div>
-		</div>
-	</footer>
+<body class="h-100 position-relative">
+  <aside id="sidebar" class="position-absolute h-100" style="z-index: 1">
+    <button id="sidebar-toggle-button" class="btn position-absolute bg-white" aria-hidden style="left: 100%">
+      <i class="fas fa-bars fa-lg"></i>
+    </button>
+    <main>
+      <h2>Package Dependency Graph for npm</h2>
+      <input type="text" id="package-input" class="form-control mb-4" placeholder="Type a package name">
+      <input type="text" id="filter-input" class="form-control mb-4" placeholder="Filter dependencies"
+        data-content="Show only nodes that contain the text given here, and nodes that have these as dependencies.">
+      <button id="button-clear" class="btn btn-secondary mb-4"
+        data-content="Remove all nodes from the diagram and start from scratch.">Clear</button>
+      <button id="button-resolve-all" class="btn btn-secondary mb-4"
+        data-content="Resolve all transitive dependencies.">Resolve All</button>
+      <div id="loading-indicator" class="indicator-icon" style="visibility: hidden;">
+        <i class="fas fa-spinner fa-spin fa-2x"></i>
+      </div>
+      <div id="error-indicator" class="indicator-icon" style="visibility: hidden;">
+        <i class="fas fa-exclamation-circle fa-2x"></i>
+      </div>
+    </main>
+
+    <footer>
+      <div>
+        Brought to you by <a href="https://typefox.io">TypeFox</a>
+        <a href="https://typefox.io"><img class="footer-logo" src="typefox.svg"></img></a>
+      </div>
+      <div class="text-right">
+        <a href="https://github.com/TypeFox/npm-dependency-graph"><i class="fab fa-github fa-lg footer-icon"></i></a>
+        Powered by <a href="https://github.com/theia-ide/sprotty">sprotty</a>
+        and <a href="https://www.eclipse.org/elk/">ELK</a>
+      </div>
+    </footer>
+  </aside>
+
+  <div id="sprotty" class="content-widget position-absolute"></div>
 
 	<script src="bundle.js"></script>
 </body>

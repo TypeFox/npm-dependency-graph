@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018 TypeFox
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@ import * as jQuery from 'jquery';
 import * as faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner';
 import * as faExclamationCircle from '@fortawesome/fontawesome-free-solid/faExclamationCircle';
 import * as faGithub from '@fortawesome/fontawesome-free-brands/faGithub';
+import * as faBars from '@fortawesome/fontawesome-free-solid/faBars';
 import fontawesome from '@fortawesome/fontawesome';
 import { TYPES } from 'sprotty';
 import { ElkFactory } from 'sprotty-elk';
@@ -22,7 +23,7 @@ import {
 } from 'depgraph-navigator/lib/browser';
 import elkFactory from 'depgraph-navigator/lib/browser/graph/elk-webworker';
 
-fontawesome.library.add(faSpinner, faExclamationCircle, faGithub);
+fontawesome.library.add(faSpinner, faExclamationCircle, faGithub, faBars);
 
 jQuery(() => {
     const packageInput = jQuery('#package-input');
@@ -139,7 +140,8 @@ jQuery(() => {
     });
 
     //---------------------------------------------------------
-    // Buttons in the button bar
+    // Buttons
+    jQuery('#sidebar-toggle-button').click(() => jQuery('body').toggleClass('sidebar-minimized'))
     jQuery('#button-clear').click(event => {
         modelSource.clear();
         filterInput.val('');
@@ -171,15 +173,6 @@ jQuery(() => {
     jQuery(window).resize(updateIndicatorBounds);
 
     //---------------------------------------------------------
-    // Layout: adapt the content widget height to the window size
-    const updateContentSize = () => {
-        const contentHeight = jQuery(window).height()! - 280;
-        jQuery('.content-widget').height(contentHeight);
-    }
-    jQuery(window).resize(updateContentSize);
-
-
-    //---------------------------------------------------------
     // Initialize the layout
     function animationFrames(number: number): Promise<void> {
         return new Promise(resolve => {
@@ -192,8 +185,5 @@ jQuery(() => {
             recurse(number);
         });
     }
-    animationFrames(2).then(() => {
-        updateIndicatorBounds();
-        updateContentSize();
-    });
+    animationFrames(2).then(() => updateIndicatorBounds());
 });
