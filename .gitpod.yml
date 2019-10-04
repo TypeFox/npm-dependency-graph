@@ -13,4 +13,5 @@ tasks:
   - command: |
       gp sync-await init
       yarn --cwd standalone-app start
+    name: standalone-app
     openMode: split-right
