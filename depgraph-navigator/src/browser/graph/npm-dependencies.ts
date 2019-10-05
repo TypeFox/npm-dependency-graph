@@ -57,7 +57,7 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
         };
     }
 
-    resolveNode(node: DependencyGraphNodeSchema): Promise<DependencyGraphNodeSchema[]> {
+    toggleResolveNode(node: DependencyGraphNodeSchema): Promise<DependencyGraphNodeSchema[]> {
 
         if (node.resolved) {
             const removeEdges = (nodeId:string) => {
