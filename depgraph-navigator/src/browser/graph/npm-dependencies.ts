@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018 TypeFox
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,8 +57,41 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
         };
     }
 
-    resolveNode(node: DependencyGraphNodeSchema): Promise<DependencyGraphNodeSchema[]> {
+    toggleResolveNode(node: DependencyGraphNodeSchema): Promise<DependencyGraphNodeSchema[]> {
+
         if (node.resolved) {
+            const removeEdges = (nodeId:string) => {
+                this.edges
+                    .filter(({ sourceId }) => sourceId === nodeId)
+                    .map(({ targetId }) => targetId)
+                    .forEach(removeEdges)
+
+                for (var i = 0; i < this.edges.length;) {
+                    if (this.edges[i].sourceId === nodeId) {
+                        this.index.remove(this.edges[i])
+                        this.edges.splice(i, 1)
+                    } else {
+                        ++i
+                    }
+                }
+            }
+
+            removeEdges(node.id)
+
+            const nodeIdsWithEdges = [
+              ...this.edges.map(({ sourceId }) => sourceId),
+              ...this.edges.map(({ targetId }) => targetId),
+            ]
+            for (var i = 0; i < this.nodes.length;) {
+                if (!nodeIdsWithEdges.includes(this.nodes[i].id)) {
+                    this.index.remove(this.nodes[i])
+                    this.nodes.splice(i, 1)
+                } else {
+                    ++i
+                }
+            }
+
+            node.resolved = false
             return Promise.resolve([]);
         }
         return this.getMetadata(node).then(versionData => {

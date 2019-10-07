@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018 TypeFox
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -94,8 +94,8 @@ export class DepGraphModelSource extends LocalModelSource {
         this.select([node.id]);
     }
 
-    async resolveNodes(nodes: DependencyGraphNodeSchema[]): Promise<void> {
-        if (nodes.every(n => !!n.hidden || !!n.resolved)) {
+    async toggleResolveNodes(nodes: DependencyGraphNodeSchema[]): Promise<void> {
+        if (nodes.every(n => !!n.hidden)) {
             this.center(nodes.map(n => n.id));
             return;
         }
@@ -106,7 +106,7 @@ export class DepGraphModelSource extends LocalModelSource {
         for (const node of nodes) {
             if (!node.hidden) {
                 try {
-                    promises.push(this.graphGenerator.resolveNode(node));
+                    promises.push(this.graphGenerator.toggleResolveNode(node));
                 } catch (error) {
                     node.error = error.toString();
                 }
@@ -130,7 +130,7 @@ export class DepGraphModelSource extends LocalModelSource {
             const promises: Promise<void>[] = [];
             for (const node of nodes) {
                 try {
-                    promises.push(this.graphGenerator.resolveNode(node).then(result => {
+                    promises.push(this.graphGenerator.toggleResolveNode(node).then(result => {
                         newNodes.push(...result);
                     }));
                 } catch (error) {
@@ -195,7 +195,7 @@ export class DepGraphModelSource extends LocalModelSource {
                 nodes.push(element as DependencyGraphNodeSchema);
         });
         if (nodes.length > 0) {
-            this.resolveNodes(nodes);
+            this.toggleResolveNodes(nodes);
         }
     }
 
@@ -207,7 +207,7 @@ export class DepGraphModelSource extends LocalModelSource {
                     nodes.push(element as DependencyGraphNodeSchema);
             });
             if (nodes.length > 0) {
-                this.resolveNodes(nodes);
+                this.toggleResolveNodes(nodes);
             }
         }
     }
