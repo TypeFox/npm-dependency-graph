@@ -7,13 +7,20 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { ContainerModule } from 'inversify';
+import { ContainerModule, Container } from 'inversify';
 import { CommandContribution, MenuContribution } from '@theia/core/lib/common';
-import { FrontendApplicationContribution, OpenHandler, KeybindingContribution, KeybindingContext, WidgetFactory } from '@theia/core/lib/browser';
-import { DiagramConfiguration, DiagramManagerProvider, DiagramManager } from 'sprotty-theia';
+import {
+    FrontendApplicationContribution, OpenHandler, KeybindingContribution, KeybindingContext, WidgetFactory
+} from '@theia/core/lib/browser';
+import { SearchBoxFactory, SearchBox, SearchBoxProps } from '@theia/core/lib/browser/tree/search-box';
+import { SearchBoxDebounce } from '@theia/core/lib/browser/tree/search-box-debounce';
+import {
+    DiagramConfiguration, DiagramManagerProvider, DiagramManager, DiagramWidgetFactory, DiagramWidgetOptions, TheiaSprottyConnector
+} from 'sprotty-theia';
 import { DepGraphDiagramConfiguration } from './widget/diagram-config';
 import { DepGraphDiagramManager } from './widget/diagram-manager';
 import { DiagramCommandContribution, DepgraphKeybindingContext } from './widget/diagram-commands';
+import { DepGraphWidget } from './widget/diagram-widget';
 
 import 'sprotty/css/sprotty.css';
 import 'sprotty-theia/css/theia-sprotty.css';
@@ -21,7 +28,15 @@ import '../../src/browser/style/depgraph.css';
 
 export default new ContainerModule(bind => {
     bind(DiagramConfiguration).to(DepGraphDiagramConfiguration).inSingletonScope();
-    bind(DepGraphDiagramManager).toSelf().inSingletonScope();
+    bind(DepGraphDiagramManager).toDynamicValue(context => {
+        const childContainer = new Container();
+        childContainer.parent = context.container;
+        childContainer.bind(DiagramWidgetFactory).toFactory(_ => {
+            return (options: DiagramWidgetOptions, widgetId: string, diContainer: Container, connector?: TheiaSprottyConnector) =>
+                new DepGraphWidget(options, createSearchBox, widgetId, diContainer, connector);
+        });
+        return childContainer.resolve(DepGraphDiagramManager);
+    }).inSingletonScope();
     bind(DiagramManagerProvider).toProvider<DiagramManager>(context => {
         return () => Promise.resolve(context.container.get(DepGraphDiagramManager));
     }).whenTargetNamed('dependency-graph');
@@ -35,3 +50,8 @@ export default new ContainerModule(bind => {
     bind(KeybindingContribution).toService(DiagramCommandContribution);
     bind(MenuContribution).toService(DiagramCommandContribution);
 });
+
+export const createSearchBox: SearchBoxFactory = (props: SearchBoxProps) => {
+    const debounce = new SearchBoxDebounce({ delay: 300 });
+    return new SearchBox(props, debounce);
+};

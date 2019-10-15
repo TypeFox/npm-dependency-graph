@@ -11,6 +11,7 @@ import { Widget } from '@phosphor/widgets';
 import { Message } from '@phosphor/messaging/lib';
 import { TYPES } from 'sprotty';
 import { DiagramWidget, DiagramWidgetOptions, TheiaSprottyConnector } from 'sprotty-theia';
+import { Deferred } from '@theia/core/lib/common/promise-util';
 import { SearchBoxFactory, SearchBox } from '@theia/core/lib/browser/tree/search-box';
 import { DepGraphModelSource } from '../graph/model-source';
 import { Container } from 'inversify';
@@ -18,6 +19,8 @@ import { Container } from 'inversify';
 export class DepGraphWidget extends DiagramWidget {
 
     protected readonly searchBox: SearchBox;
+
+    attached = new Deferred<void>();
 
     get modelSource(): DepGraphModelSource {
         return this.diContainer.get(TYPES.ModelSource);
@@ -46,6 +49,12 @@ export class DepGraphWidget extends DiagramWidget {
         this.addKeyListener(this.node,
             this.searchBox.keyCodePredicate.bind(this.searchBox),
             this.searchBox.handle.bind(this.searchBox));
+        this.attached.resolve();
+    }
+
+    protected onBeforeDetach(msg: Message): void {
+        this.attached = new Deferred<void>();
+        super.onBeforeDetach(msg);
     }
 
 }

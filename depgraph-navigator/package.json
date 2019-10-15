@@ -33,14 +33,14 @@
     "@theia/core": "next",
     "@theia/navigator": "next",
     "elkjs": "latest",
-    "semver": "latest",
+    "semver": "^6.3.0",
     "sprotty": "next",
     "sprotty-elk": "next",
     "sprotty-theia": "next"
   },
   "devDependencies": {
-    "rimraf": "^2.6.1",
-    "typescript": "^3.1.3"
+    "rimraf": "^3.0.0",
+    "typescript": "^3.6.4"
   },
   "scripts": {
     "prepare": "yarn run clean && yarn run build",

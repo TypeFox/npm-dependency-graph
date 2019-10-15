@@ -9,7 +9,7 @@
     "lerna": "^2.2.0"
   },
   "resolutions": {
-    "**/devbridge-autocomplete/@types/jquery": "3.3.2"
+    "**/devbridge-autocomplete/@types/jquery": "3.3.31"
   },
   "workspaces": [
     "depgraph-navigator",

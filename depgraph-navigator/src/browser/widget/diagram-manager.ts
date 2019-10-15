@@ -9,14 +9,11 @@
 
 import { injectable, inject } from 'inversify';
 import URI from '@theia/core/lib/common/uri';
-import { WidgetOpenerOptions, Widget } from '@theia/core/lib/browser';
-import { SearchBoxFactory, SearchBoxProps, SearchBox } from '@theia/core/lib/browser/tree/search-box';
+import { WidgetOpenerOptions } from '@theia/core/lib/browser';
 import { FileSystem } from '@theia/filesystem/lib/common';
-import { DiagramManager, DiagramWidgetOptions } from 'sprotty-theia';
-import { DepGraphModelSource } from '../graph/model-source';
+import { DiagramManager, DiagramWidget } from 'sprotty-theia';
 import { NodeModulesGraphGenerator } from './node-modules';
 import { DepGraphWidget } from './diagram-widget';
-import { SearchBoxDebounce } from '@theia/core/lib/browser/tree/search-box-debounce';
 
 @injectable()
 export class DepGraphDiagramManager extends DiagramManager {
@@ -35,24 +32,17 @@ export class DepGraphDiagramManager extends DiagramManager {
             return 0;
     }
 
-    async createWidget(options?: any): Promise<Widget> {
-        if (DiagramWidgetOptions.is(options)) {
-            const clientId = this.createClientId();
-            const config = this.diagramConfigurationRegistry.get(options.diagramType);
-            const diContainer = config.createContainer(clientId + '_sprotty');
-            const diagramWidget = new DepGraphWidget(options, createSearchBox, clientId, diContainer, this.diagramConnector);
-            this.createModel(new URI(options.uri), diagramWidget.modelSource);
-            return diagramWidget;
-        }
-        throw Error('DiagramWidgetFactory needs DiagramWidgetOptions but got ' + JSON.stringify(options));
+    async createWidget(options?: any): Promise<DiagramWidget> {
+        const diagramWidget = await super.createWidget(options) as DepGraphWidget;
+        this.createModel(new URI(options.uri), diagramWidget);
+        return diagramWidget;
     }
 
-    protected async createModel(uri: URI, modelSource: DepGraphModelSource): Promise<void> {
-        // Workaround for https://github.com/theia-ide/sprotty/issues/218
-        await animationFrames(4);
-
+    protected async createModel(uri: URI, diagramWidget: DepGraphWidget): Promise<void> {
+        await diagramWidget.attached.promise;
         const { content } = await this.fileSystem.resolveContent(uri.toString());
         const pck = JSON.parse(content);
+        const modelSource = diagramWidget.modelSource;
         const generator = modelSource.graphGenerator as NodeModulesGraphGenerator;
         generator.startUri = uri;
         const node = generator.generateNode(pck.name, pck.version);
@@ -69,23 +59,3 @@ export class DepGraphDiagramManager extends DiagramManager {
     }
 
 }
-
-function animationFrames(number: number): Promise<void> {
-    if (number < 0) {
-        throw new Error('Illegal argument: ' + number);
-    }
-    return new Promise(resolve => {
-        function recurse(n: number): void {
-            if (n === 0)
-                resolve();
-            else
-                window.requestAnimationFrame(() => recurse(n - 1));
-        }
-        recurse(number);
-    });
-}
-
-export const createSearchBox: SearchBoxFactory = (props: SearchBoxProps) => {
-    const debounce = new SearchBoxDebounce({ delay: 300 });
-    return new SearchBox(props, debounce);
-};

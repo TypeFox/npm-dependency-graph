@@ -27,15 +27,15 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
     readonly edges: DependencyGraphEdgeSchema[] = [];
     readonly index = new SModelIndex<SModelElementSchema>();
 
-    generateNode(name: string, version?: string): DependencyGraphNodeSchema {
+    generateNode(name: string, requiredVersion?: string): DependencyGraphNodeSchema {
         let node = this.index.getById(name) as DependencyGraphNodeSchema;
         if (node === undefined) {
             node = this.createNode(name);
             this.nodes.push(node);
             this.index.add(node);
         }
-        if (version && node.versions.indexOf(version) < 0) {
-            node.versions.push(version);
+        if (requiredVersion && node.requiredVersions.indexOf(requiredVersion) < 0) {
+            node.requiredVersions.push(requiredVersion);
         }
         return node;
     }
@@ -45,7 +45,7 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
             type: 'node',
             id: name,
             name,
-            versions: [],
+            requiredVersions: [],
             layout: 'vbox',
             children: [
                 <SLabelSchema>{
@@ -58,45 +58,54 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
     }
 
     toggleResolveNode(node: DependencyGraphNodeSchema): Promise<DependencyGraphNodeSchema[]> {
-
         if (node.resolved) {
-            const removeEdges = (nodeId:string) => {
-                this.edges
-                    .filter(({ sourceId }) => sourceId === nodeId)
-                    .map(({ targetId }) => targetId)
-                    .forEach(removeEdges)
-
-                for (var i = 0; i < this.edges.length;) {
-                    if (this.edges[i].sourceId === nodeId) {
-                        this.index.remove(this.edges[i])
-                        this.edges.splice(i, 1)
-                    } else {
-                        ++i
-                    }
-                }
-            }
-
-            removeEdges(node.id)
-
-            const nodeIdsWithEdges = [
-              ...this.edges.map(({ sourceId }) => sourceId),
-              ...this.edges.map(({ targetId }) => targetId),
-            ]
-            for (var i = 0; i < this.nodes.length;) {
-                if (!nodeIdsWithEdges.includes(this.nodes[i].id)) {
-                    this.index.remove(this.nodes[i])
-                    this.nodes.splice(i, 1)
-                } else {
-                    ++i
-                }
-            }
-
-            node.resolved = false
+            this.unresolveNode(node);
             return Promise.resolve([]);
+        } else {
+            return this.resolveNode(node);
         }
+    }
+
+    unresolveNode(node: DependencyGraphNodeSchema): void {
+        const removeEdges = (nodeId:string) => {
+            this.edges
+                .filter(({ sourceId }) => sourceId === nodeId)
+                .map(({ targetId }) => targetId)
+                .forEach(removeEdges);
+
+            for (var i = 0; i < this.edges.length;) {
+                if (this.edges[i].sourceId === nodeId) {
+                    this.index.remove(this.edges[i]);
+                    this.edges.splice(i, 1);
+                } else {
+                    ++i;
+                }
+            }
+        }
+
+        removeEdges(node.id);
+
+        const nodeIdsWithEdges = [
+          ...this.edges.map(({ sourceId }) => sourceId),
+          ...this.edges.map(({ targetId }) => targetId),
+        ];
+        for (var i = 0; i < this.nodes.length;) {
+            if (!nodeIdsWithEdges.includes(this.nodes[i].id)) {
+                this.index.remove(this.nodes[i]);
+                this.nodes.splice(i, 1);
+            } else {
+                ++i;
+            }
+        }
+
+        node.resolved = false;
+    }
+
+    resolveNode(node: DependencyGraphNodeSchema): Promise<DependencyGraphNodeSchema[]> {
         return this.getMetadata(node).then(versionData => {
             const result: DependencyGraphNodeSchema[] = [];
             if (versionData) {
+                node.version = versionData.version;
                 node.description = versionData.description;
                 node.url = `${this.websiteUrl}/package/${node.name}`;
                 if (versionData.dependencies)
@@ -119,7 +128,7 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
         if (versionData)
             return versionData;
         else
-            return Promise.reject(new Error(`No matching versions found for ${node.name}: ${node.versions}`));
+            return Promise.reject(new Error(`No matching versions found for ${node.name}: ${node.requiredVersions}`));
     }
 
     protected request(url: string): Promise<any> {
@@ -144,8 +153,8 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
     }
 
     protected findVersion(node: DependencyGraphNodeSchema, data: PackageMetadata): VersionMetadata | undefined {
-        for (let i = 0; i < node.versions.length; i++) {
-            const match = maxSatisfying(Object.keys(data.versions), node.versions[i]);
+        for (let i = 0; i < node.requiredVersions.length; i++) {
+            const match = maxSatisfying(Object.keys(data.versions), node.requiredVersions[i]);
             if (match)
                 return data.versions[match];
         }
@@ -164,7 +173,20 @@ export class NpmDependencyGraphGenerator implements IGraphGenerator {
                 id: `dependency:${node.name}>${dep}`,
                 optional,
                 sourceId: node.id,
-                targetId: depNode.id
+                targetId: depNode.id,
+                children: [
+                    <SLabelSchema> {
+                        type: 'label',
+                        id: `dependency_version:${node.name}>${dep}`,
+                        text: dependencies[dep],
+                        edgePlacement: {
+                            position: 1,
+                            offset: 4,
+                            side: 'bottom',
+                            rotate: true
+                        }
+                    }
+                ]
             };
             if (!this.index.contains(depEdge)) {
                 this.edges.push(depEdge);

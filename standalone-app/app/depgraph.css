@@ -36,6 +36,12 @@
     fill: #777;
 }
 
+.sprotty-edge > text {
+    stroke: none;
+    fill: #aaa;
+    font-size: 10pt;
+}
+
 .sprotty-edge.optional {
     fill: none;
     stroke: #bbb;
@@ -47,7 +53,7 @@
 }
 
 .sprotty-label {
-    stroke-width: 0;
+    stroke: none;
     fill: #333;
     font-family: sans-serif;
     dominant-baseline: hanging;

@@ -8,14 +8,15 @@
  */
 
 import {
-    RectangularNode, moveFeature, SEdge, editFeature, SNodeSchema, SEdgeSchema, SModelElementSchema
+    RectangularNode, SEdge, SNodeSchema, SEdgeSchema, SModelElementSchema
 } from 'sprotty';
 
 export interface DependencyGraphNodeSchema extends SNodeSchema {
     name: string
-    versions: string[]
+    requiredVersions: string[]
     resolved?: boolean
     hidden?: boolean
+    version?: string
     description?: string
     url?: string
     error?: string
@@ -33,13 +34,6 @@ export class DependencyGraphNode extends RectangularNode {
     description?: string;
     url?: string;
     error?: string;
-
-    hasFeature(feature: symbol): boolean {
-        if (feature === moveFeature)
-            return false;
-        else
-            return super.hasFeature(feature);
-    }
 }
 
 export interface DependencyGraphEdgeSchema extends SEdgeSchema {
@@ -57,12 +51,5 @@ export class DependencyGraphEdge extends SEdge {
         super();
         this.sourceAnchorCorrection = 1;
         this.targetAnchorCorrection = 1.5;
-    }
-
-    hasFeature(feature: symbol): boolean {
-        if (feature === editFeature)
-            return false;
-        else
-            return super.hasFeature(feature);
     }
 }

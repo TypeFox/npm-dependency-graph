@@ -10,7 +10,7 @@
 import { injectable, inject, postConstruct } from 'inversify';
 import {
     LocalModelSource, ActionHandlerRegistry, SelectAction, FitToScreenAction,
-    SelectAllAction, Action, SelectCommand, SelectAllCommand, SModelElementSchema
+    SelectAllAction, Action, SModelElementSchema
 } from 'sprotty';
 import { IGraphGenerator } from './graph-generator';
 import { DependencyGraphNodeSchema, isNode } from './graph-model';
@@ -38,8 +38,8 @@ export class DepGraphModelSource extends LocalModelSource {
     initialize(registry: ActionHandlerRegistry): void {
         super.initialize(registry);
 
-        registry.register(SelectCommand.KIND, this);
-        registry.register(SelectAllCommand.KIND, this);
+        registry.register(SelectAction.KIND, this);
+        registry.register(SelectAllAction.KIND, this);
     }
 
     select(elementIds: string[]): Promise<void> {
@@ -94,7 +94,7 @@ export class DepGraphModelSource extends LocalModelSource {
         this.select([node.id]);
     }
 
-    async toggleResolveNodes(nodes: DependencyGraphNodeSchema[]): Promise<void> {
+    async resolveNodes(nodes: DependencyGraphNodeSchema[], toggle: boolean): Promise<void> {
         if (nodes.every(n => !!n.hidden)) {
             this.center(nodes.map(n => n.id));
             return;
@@ -106,7 +106,10 @@ export class DepGraphModelSource extends LocalModelSource {
         for (const node of nodes) {
             if (!node.hidden) {
                 try {
-                    promises.push(this.graphGenerator.toggleResolveNode(node));
+                    if (toggle)
+                        promises.push(this.graphGenerator.toggleResolveNode(node));
+                    else
+                        promises.push(this.graphGenerator.resolveNode(node));
                 } catch (error) {
                     node.error = error.toString();
                 }
@@ -130,7 +133,7 @@ export class DepGraphModelSource extends LocalModelSource {
             const promises: Promise<void>[] = [];
             for (const node of nodes) {
                 try {
-                    promises.push(this.graphGenerator.toggleResolveNode(node).then(result => {
+                    promises.push(this.graphGenerator.resolveNode(node).then(result => {
                         newNodes.push(...result);
                     }));
                 } catch (error) {
@@ -176,10 +179,10 @@ export class DepGraphModelSource extends LocalModelSource {
 
     handle(action: Action): void {
         switch (action.kind) {
-            case SelectCommand.KIND:
+            case SelectAction.KIND:
                 this.handleSelect(action as SelectAction);
                 break;
-            case SelectAllCommand.KIND:
+            case SelectAllAction.KIND:
                 this.handleSelectAll(action as SelectAllAction);
                 break;
             default:
@@ -195,7 +198,7 @@ export class DepGraphModelSource extends LocalModelSource {
                 nodes.push(element as DependencyGraphNodeSchema);
         });
         if (nodes.length > 0) {
-            this.toggleResolveNodes(nodes);
+            this.resolveNodes(nodes, nodes.length === 1);
         }
     }
 
@@ -207,7 +210,7 @@ export class DepGraphModelSource extends LocalModelSource {
                     nodes.push(element as DependencyGraphNodeSchema);
             });
             if (nodes.length > 0) {
-                this.toggleResolveNodes(nodes);
+                this.resolveNodes(nodes, false);
             }
         }
     }

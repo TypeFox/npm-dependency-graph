@@ -7,14 +7,11 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+const webpack = require('webpack');
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-module.exports = function(env) {
-    if (!env) {
-        env = {}
-    }
-
+module.exports = function(env, argv) {
     const buildRoot = path.resolve(__dirname, 'lib');
     const appRoot = path.resolve(__dirname, 'app');
     const bootstrapDistPath = '../node_modules/bootstrap/dist';
@@ -23,7 +20,7 @@ module.exports = function(env) {
     const elkWorkerPath = '../node_modules/elkjs/lib/elk-worker.min.js';
 
     const rules = [];
-    if (env.production) {
+    if (argv.mode === 'production') {
         rules.push({
             test: /.*\.js$/,
             exclude: /snabbdom(\/|\\)es|fontawesome(\/|\\)index.es.js|popper.js(\/|\\)dist(\/|\\)esm/,
@@ -45,6 +42,7 @@ module.exports = function(env) {
             filename: 'bundle.js',
             path: appRoot
         },
+
         target: 'web',
         module: { rules },
         resolve: {
@@ -57,6 +55,7 @@ module.exports = function(env) {
             net: 'empty',
             crypto: 'empty'
         },
+
         plugins: [
             new CopyWebpackPlugin([{
                 from: bootstrapDistPath,
@@ -73,7 +72,8 @@ module.exports = function(env) {
             new CopyWebpackPlugin([{
                 from: elkWorkerPath,
                 to: 'elk'
-            }])
+            }]),
+            new webpack.ProgressPlugin()
         ]
     }
 }

@@ -11,9 +11,7 @@ import { ContainerModule, Container, interfaces } from 'inversify';
 import {
     TYPES, ConsoleLogger, LogLevel, SGraphFactory, configureModelElement, SGraph,
     SGraphView, HtmlRoot, HtmlRootView, PreRenderedElement, PreRenderedView, SLabel,
-    SLabelView, SCompartment, SCompartmentView, defaultModule, selectModule, moveModule,
-    boundsModule, fadeModule, viewportModule, exportModule, hoverModule, edgeEditModule,
-    updateModule, graphModule, routingModule, edgeLayoutModule, modelSourceModule
+    SLabelView, SCompartment, SCompartmentView, loadDefaultModules, moveFeature, editFeature
 } from 'sprotty';
 import { ILayoutConfigurator, elkLayoutModule } from 'sprotty-elk';
 import { DependencyGraphNode, DependencyGraphEdge } from './graph-model';
@@ -35,10 +33,15 @@ export default (additionalBindings?: interfaces.ContainerModuleCallBack) => {
         rebind(TYPES.ILogger).to(ConsoleLogger).inSingletonScope();
         rebind(TYPES.LogLevel).toConstantValue(LogLevel.warn);
         rebind(TYPES.IModelFactory).to(SGraphFactory).inSingletonScope();
+
         const context = { bind, unbind, isBound, rebind };
         configureModelElement(context, 'graph', SGraph, SGraphView);
-        configureModelElement(context, 'node', DependencyGraphNode, DependencyNodeView);
-        configureModelElement(context, 'edge', DependencyGraphEdge, DependencyEdgeView);
+        configureModelElement(context, 'node', DependencyGraphNode, DependencyNodeView, {
+            disable: [moveFeature]
+        });
+        configureModelElement(context, 'edge', DependencyGraphEdge, DependencyEdgeView, {
+            disable: [editFeature]
+        });
         configureModelElement(context, 'label', SLabel, SLabelView);
         configureModelElement(context, 'compartment', SCompartment, SCompartmentView);
         configureModelElement(context, 'html', HtmlRoot, HtmlRootView);
@@ -49,8 +52,7 @@ export default (additionalBindings?: interfaces.ContainerModuleCallBack) => {
     });
 
     const container = new Container();
-    container.load(defaultModule, graphModule, updateModule, modelSourceModule, routingModule,
-        selectModule, moveModule, boundsModule, fadeModule, viewportModule, exportModule,
-        hoverModule, edgeLayoutModule, edgeEditModule, elkLayoutModule, depGraphModule);
+    loadDefaultModules(container);
+    container.load(elkLayoutModule, depGraphModule);
     return container;
 };
