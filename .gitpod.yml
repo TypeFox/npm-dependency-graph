@@ -9,7 +9,7 @@ tasks:
   - init: yarn
     command: |
       gp sync-done init
-      yarn --cwd browser-app start
+      yarn --cwd browser-app start /workspace/npm-dependency-graph/
   - command: |
       gp sync-await init
       yarn --cwd standalone-app start
