@@ -19,14 +19,17 @@ import fontawesome from '@fortawesome/fontawesome';
 import { TYPES } from 'sprotty';
 import { ElkFactory } from 'sprotty-elk';
 import {
-    containerFactory, DepGraphModelSource, REGISTRY_URL, NpmDependencyGraphGenerator, IGraphGenerator
+    containerFactory, DepGraphModelSource, REGISTRY_URL, API_URL, NpmDependencyGraphGenerator, IGraphGenerator
 } from 'depgraph-navigator/lib/browser';
 import elkFactory from 'depgraph-navigator/lib/browser/graph/elk-webworker';
+import axios from 'axios'
+import { debounce } from 'ts-debounce'
 
 fontawesome.library.add(faSpinner, faExclamationCircle, faGithub, faBars);
 
 jQuery(() => {
     const packageInput = jQuery('#package-input');
+    const maintainerInput = jQuery('#maintainer-input');
     const loadingIndicator = jQuery('#loading-indicator');
     const errorIndicator = jQuery('#error-indicator');
 
@@ -91,6 +94,32 @@ jQuery(() => {
             createNode(packageInput.val() as string);
     });
     packageInput.focus();
+
+    //---------------------------------------------------------
+    // Maintainer input
+    maintainerInput.keyup(debounce(
+        ({ keyCode }) => {
+            if (keyCode !== 13) {
+                const maintainerName = maintainerInput.val() as string;
+                axios.get(`${API_URL}/search?q=maintainer:${maintainerName}`)
+                    .then(({ data: { total } }: { data: { total: number } }) => {
+                        maintainerInput.toggleClass('is-valid', total > 0);
+                        maintainerInput.toggleClass('is-invalid', total === 0);
+                    });
+            }
+        },
+        200
+    ));
+
+    maintainerInput.keyup(({ keyCode }) => {
+      const maintainerName = maintainerInput.val() as string;
+      if (keyCode === 13) {
+        axios.get(`${API_URL}/search?q=maintainer:${maintainerName}`)
+          .then(({ data: { results } }: { data: { results: any[] } }) =>
+            results.forEach((result:any) => createNode(result.package.name))
+          );
+      }
+    });
 
     //---------------------------------------------------------
     // Manage the error indicator icon and its popup box
