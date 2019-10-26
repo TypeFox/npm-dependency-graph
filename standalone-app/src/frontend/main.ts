@@ -114,7 +114,7 @@ jQuery(() => {
     maintainerInput.keyup(({ keyCode }) => {
       const maintainerName = maintainerInput.val() as string;
       if (keyCode === 13) {
-        axios.get(`${API_URL}/search?q=maintainer:${maintainerName}`)
+        axios.get(`${API_URL}/search?q=maintainer:${maintainerName}+not:deprecated`)
           .then(({ data: { results } }: { data: { results: any[] } }) =>
             results.forEach((result:any) => createNode(result.package.name))
           );
