@@ -121,6 +121,11 @@ jQuery(() => {
       }
     });
 
+    maintainerInput.popover({
+        trigger: 'hover',
+        placement: 'top'
+    });
+
     //---------------------------------------------------------
     // Manage the error indicator icon and its popup box
     let errorMessageTimeout: number;
