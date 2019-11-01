@@ -7,13 +7,15 @@
     "@fortawesome/fontawesome": "^1.1.8",
     "@fortawesome/fontawesome-free-brands": "^5.0.13",
     "@fortawesome/fontawesome-free-solid": "^5.0.13",
+    "axios": "^0.19.0",
     "bootstrap": "^4.3.1",
     "depgraph-navigator": "0.1.0",
     "devbridge-autocomplete": "^1.4.10",
     "express": "^4.17.1",
     "jquery": "^3.4.1",
     "popper.js": "^1.15.0",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "ts-debounce": "^1.0.0"
   },
   "devDependencies": {
     "@types/bootstrap": "^4.3.1",

@@ -15,6 +15,7 @@ import { DependencyGraphNodeSchema, DependencyGraphEdgeSchema } from './graph-mo
 import { PackageMetadata, VersionMetadata } from './registry-metadata';
 
 export const REGISTRY_URL = 'https://registry.npmjs.org';
+export const API_URL = 'https://api.npms.io/v2';
 export const WEBSITE_URL = 'https://www.npmjs.com';
 
 @injectable()
