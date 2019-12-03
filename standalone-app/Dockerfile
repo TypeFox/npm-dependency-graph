@@ -1,7 +1,10 @@
 # Build the project and start the standalone application
 
-FROM kkarczmarczyk/node-yarn:latest
+FROM node:10.15.3
 USER root
+RUN apt-get update && \
+    apt-get install -y libx11-dev libxkbfile-dev
+RUN npm i -g yarn
 RUN useradd -m depgraph
 ADD --chown=depgraph . /home/depgraph/npm-dependency-graph
 
