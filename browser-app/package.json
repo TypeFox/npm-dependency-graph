@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "browser-app",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "dependencies": {
     "@theia/core": "next",
     "@theia/filesystem": "next",
@@ -16,7 +16,7 @@
     "@theia/monaco": "next",
     "@theia/typescript": "next",
     "@theia/messages": "next",
-    "depgraph-navigator": "0.1.0"
+    "depgraph-navigator": "0.2.0"
   },
   "devDependencies": {
     "@theia/cli": "next"
