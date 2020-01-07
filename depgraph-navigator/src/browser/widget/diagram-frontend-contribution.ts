@@ -13,6 +13,8 @@ import { KeybindingContribution, KeybindingRegistry, ApplicationShell, Keybindin
 import { DiagramMenus, DiagramWidget } from 'sprotty-theia';
 import { DepGraphModelSource } from '../graph/model-source';
 import { DepGraphWidget } from './diagram-widget';
+import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
+import { ColorRegistry, Color } from '@theia/core/lib/browser/color-registry';
 
 export const RESOLVE_GRAPH = 'diagram.resolveGraph'
 
@@ -30,7 +32,7 @@ export class DepgraphKeybindingContext implements KeybindingContext {
 }
 
 @injectable()
-export class DiagramCommandContribution implements CommandContribution, KeybindingContribution, MenuContribution {
+export class DiagramFrontendContribution implements CommandContribution, KeybindingContribution, MenuContribution, ColorContribution {
 
     @inject(ApplicationShell) protected readonly shell!: ApplicationShell;
     @inject(DepgraphKeybindingContext) protected readonly keybindingContext!: DepgraphKeybindingContext;
@@ -66,5 +68,46 @@ export class DiagramCommandContribution implements CommandContribution, Keybindi
         registry.registerMenuAction(DiagramMenus.DIAGRAM, {
             commandId: RESOLVE_GRAPH
         })
+    }
+
+    registerColors(colors: ColorRegistry) {
+        colors.register(
+            {
+                id: 'sprotty.nodeBackground',
+                defaults: {
+                    dark: '#99aa99',
+                    light: '#22cc22',
+                    hc:'#ccffcc'
+                },
+                description: 'The background color of a diagramm node.'
+            },
+            {
+                id: 'sprotty.nodeBackgroundHover',
+                defaults: {
+                    dark: '#aabbaa',
+                    light: '#33dd33',
+                    hc: '#eeffee'
+                },
+                description: 'The background color of a diagramm node.'
+            },
+            {
+                id: 'sprotty.nodeForeground',
+                defaults: {
+                    dark: Color.white,
+                    light: Color.black,
+                    hc: Color.black
+                },
+                description: 'The foreground color of a diagramm node.'
+            },
+            {
+                id: 'sprotty.nodeBorder',
+                defaults: {
+                    dark: '#339933',
+                    light: '#00aa00',
+                    hc: '#66dd66'
+                },
+                description: 'The border color of a diagramm node.'
+            }
+        );
     }
 }
