@@ -19,7 +19,8 @@ import {
 } from 'sprotty-theia';
 import { DepGraphDiagramConfiguration } from './widget/diagram-config';
 import { DepGraphDiagramManager } from './widget/diagram-manager';
-import { DiagramCommandContribution, DepgraphKeybindingContext } from './widget/diagram-commands';
+import { DiagramFrontendContribution, DepgraphKeybindingContext } from './widget/diagram-frontend-contribution';
+import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
 import { DepGraphWidget } from './widget/diagram-widget';
 
 import 'sprotty/css/sprotty.css';
@@ -45,10 +46,11 @@ export default new ContainerModule(bind => {
     bind(WidgetFactory).toService(DepGraphDiagramManager);
     bind(DepgraphKeybindingContext).toSelf().inSingletonScope();
     bind(KeybindingContext).toService(DepgraphKeybindingContext);
-    bind(DiagramCommandContribution).toSelf().inSingletonScope();
-    bind(CommandContribution).toService(DiagramCommandContribution);
-    bind(KeybindingContribution).toService(DiagramCommandContribution);
-    bind(MenuContribution).toService(DiagramCommandContribution);
+    bind(DiagramFrontendContribution).toSelf().inSingletonScope();
+    bind(CommandContribution).toService(DiagramFrontendContribution);
+    bind(KeybindingContribution).toService(DiagramFrontendContribution);
+    bind(MenuContribution).toService(DiagramFrontendContribution);
+    bind(ColorContribution).toService(DiagramFrontendContribution);
 });
 
 export const createSearchBox: SearchBoxFactory = (props: SearchBoxProps) => {

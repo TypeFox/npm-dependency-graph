@@ -9,23 +9,23 @@
 
 .sprotty-node {
     stroke-width: 1;
-    stroke: var(--theia-disabled-color2);
-    fill: var(--theia-disabled-color1);
+    stroke: var(--theia-sprotty-nodeBorder);
+    fill: var(--theia-sprotty-nodeBackground);
 }
 
 .sprotty-node.resolved {
-    stroke: var(--theia-accent-color2);
-    fill: var(--theia-accent-color3);
+    stroke: var(--theia-focusBorder);
+    fill: var(--theia-selection-background);
 }
 
 .sprotty-node.error {
-    stroke: var(--theia-error-color3);
-    fill: var(--theia-error-color2);
+    stroke: var(--theia-inputValidation-errorBorder);
+    fill: var(--theia-errorBackground);
 }
 
 .sprotty-edge {
     fill: none;
-    stroke: var(--theia-ui-font-color1);
+    stroke: var(--theia-foreground);
     stroke-width: 1;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -33,22 +33,22 @@
 
 .sprotty-edge > .arrow {
     stroke: none;
-    fill: var(--theia-ui-font-color1);
+    fill: var(--theia-foreground);
 }
 
 .sprotty-edge.optional {
     fill: none;
-    stroke: var(--theia-ui-font-color2);
+    stroke: var(--theia-descriptionForeground);
     stroke-dasharray: 5,5;
 }
 
 .sprotty-edge.optional > .arrow {
-    fill: var(--theia-ui-font-color2);
+    fill: var(--theia-descriptionForeground);
 }
 
 .sprotty-label {
     stroke-width: 0;
-    fill: var(--theia-ui-font-color0);
+    fill: var(--theia-sprotty-nodeForeground);
     font-family: var(--theia-ui-font-family);
     font-size: var(--theia-ui-font-size2);
     dominant-baseline: hanging;
@@ -58,21 +58,21 @@
     stroke-width: 3;
 }
 
-.mouseover > rect {
-    stroke: var(--theia-accent-color0);
+rect.mouseover {
+    stroke: var(--theia-sprotty-nodeBackgroundHover);
 }
 
 .sprotty-popup {
     z-index: 1000;
-    color: var(--theia-ui-font-color0);
+    color: var(--theia-foreground);
     font-family: var(--theia-ui-font-family);
     font-size: var(--theia-ui-font-size1);
-    background: var(--theia-layout-color2);
-    border-color: var(--theia-border-color2);
+    background: var(--theia-editorWidget-background);
+    border-color: var(--theia-editorWidget-border);
 }
 
 .sprotty-popup a {
-    color: var(--theia-accent-color0);
+    color: var(--theia-foreground);
 }
 
 .sprotty-popup-title {
@@ -81,7 +81,7 @@
 }
 
 .sprotty-popup-body.error {
-    color: var(--theia-error-color0);
+    color: var(--theia-errorForeground);
 }
 
 .sprotty-popup-body.unresolved {
@@ -90,5 +90,5 @@
 
 .popup-info-version {
     margin-left: 12px;
-    color: var(--theia-content-font-color2);
+    color: var(--theia-editorInfo-foreground);
 }
