@@ -74,11 +74,15 @@ body.sidebar-minimized .content-widget {
 
 .footer-logo {
     height: 24px;
-    margin: 0px 8px;
+    margin: 0px 6px;
 }
 
 .footer-icon {
-    margin: 0px 10px;
+    margin: 0px 4px;
+}
+
+.footer-button {
+    margin: 10px;
 }
 
 .sprotty svg {
